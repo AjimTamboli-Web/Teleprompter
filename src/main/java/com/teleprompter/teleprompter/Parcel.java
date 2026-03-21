@@ -3,6 +3,9 @@ package com.teleprompter.teleprompter;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -13,6 +16,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.SequenceGenerator;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -20,12 +24,13 @@ import lombok.Setter;
 public class Parcel {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "parcel_seq")
+	@SequenceGenerator(name = "parcel_seq",sequenceName = "parcel_sequence",allocationSize = 50)
 	private Long id;
 	
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "sender_id",nullable = false)
-	private User senderId;
+	private User sender;
 	
 	@Column(columnDefinition = "TEXT")
 	private String description;
@@ -33,13 +38,16 @@ public class Parcel {
 	@Column(precision = 6,scale = 2,nullable = false)
 	private BigDecimal weight;
 	
-	@Column(precision = 6,scale = 2,nullable = false)
+	@Column(precision = 10,scale = 2,nullable = false)
 	private BigDecimal value;
 	
 	@Column(nullable = false)
 	private boolean fragile;
 	
-	@Column(length = 50,nullable = false)
+	@Column(nullable = false)
+	private boolean restrictedItemsDeclared;
+	
+	@Column(length = 500,nullable = false)
 	private String photoUrl;
 	
 	@Column(nullable = false)
@@ -47,12 +55,11 @@ public class Parcel {
 	private ParcelCategory category;
 	
 	@Column(nullable = false)
-	private boolean restrictedItems;
-	
-	@Column(nullable = false)
+	@CreationTimestamp
 	private LocalDateTime createdAt;
 	
 	@Column(nullable = false)
+	@UpdateTimestamp
 	private LocalDateTime updatedAt;
 	
 	
