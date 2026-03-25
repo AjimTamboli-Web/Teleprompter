@@ -29,11 +29,11 @@ public class DeliveryRequest {
 	private Long id;
 	
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "parcel_id")
+	@JoinColumn(name = "parcel_id", nullable = false)
 	private Parcel parcel;
 	
 	@ManyToOne(fetch = FetchType.LAZY) 
-	@JoinColumn(name = "journey_id")
+	@JoinColumn(name = "journey_id",nullable = false)
 	private Journey journey;
 	
 	@Column(length = 255 )
@@ -42,20 +42,21 @@ public class DeliveryRequest {
 	@Column(length = 255)
 	private String dropAddress;
 	
-	@ColumnDefault("PENDING")
+	@Column(nullable = false)
+	@ColumnDefault("'PENDING'")
 	@Enumerated(EnumType.STRING)
 	private DeliveryRequestStatus status = DeliveryRequestStatus.PENDING;
 	
-	@Column(nullable = false)
+
 	private LocalDateTime acceptedAt;
 	
-	@Column(nullable = false)
+	
 	private LocalDateTime pickedUpAt;
 	
-	@Column(nullable = false)
+	
 	private LocalDateTime deliveredAt;
 	
-	@Column(nullable = false)
+	
 	private LocalDateTime closedAt;
 	
 	@CreationTimestamp
