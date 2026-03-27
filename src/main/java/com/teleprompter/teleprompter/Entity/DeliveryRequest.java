@@ -1,10 +1,12 @@
-package com.teleprompter.teleprompter;
+package com.teleprompter.teleprompter.Entity;
 
 import java.time.LocalDateTime;
 
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+
+import com.teleprompter.teleprompter.Enums.DeliveryRequestStatus;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -36,10 +38,10 @@ public class DeliveryRequest {
 	@JoinColumn(name = "journey_id",nullable = false)
 	private Journey journey;
 	
-	@Column(length = 255 )
+	@Column(length = 255,nullable = false )
 	private String pickupAddress;
 	
-	@Column(length = 255)
+	@Column(length = 255, nullable = false)
 	private String dropAddress;
 	
 	@Column(nullable = false)
@@ -50,12 +52,9 @@ public class DeliveryRequest {
 
 	private LocalDateTime acceptedAt;
 	
-	
 	private LocalDateTime pickedUpAt;
 	
-	
 	private LocalDateTime deliveredAt;
-	
 	
 	private LocalDateTime closedAt;
 	

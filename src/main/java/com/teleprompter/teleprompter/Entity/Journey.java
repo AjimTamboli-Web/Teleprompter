@@ -1,10 +1,13 @@
-package com.teleprompter.teleprompter;
+package com.teleprompter.teleprompter.Entity;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 
 import org.hibernate.annotations.ColumnDefault;
+
+import com.teleprompter.teleprompter.Enums.JourneyStatus;
+import com.teleprompter.teleprompter.Enums.TransportMode;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

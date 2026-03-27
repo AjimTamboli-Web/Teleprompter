@@ -1,10 +1,12 @@
-package com.teleprompter.teleprompter;
+package com.teleprompter.teleprompter.Entity;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+
+import com.teleprompter.teleprompter.Enums.ParcelCategory;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
