@@ -1,4 +1,4 @@
-package com.teleprompter.teleprompter.Enums;
+package com.teleprompter.teleprompter.enums;
 
 public enum TransportMode {
 

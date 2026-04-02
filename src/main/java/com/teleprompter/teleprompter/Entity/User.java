@@ -1,10 +1,10 @@
-package com.teleprompter.teleprompter.Entity;
+package com.teleprompter.teleprompter.entity;
 
 import java.util.UUID;
 
 import org.hibernate.annotations.ColumnDefault;
 
-import com.teleprompter.teleprompter.Enums.UserStatus;
+import com.teleprompter.teleprompter.enums.UserStatus;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

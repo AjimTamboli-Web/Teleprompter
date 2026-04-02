@@ -1,4 +1,4 @@
-package com.teleprompter.teleprompter.Entity;
+package com.teleprompter.teleprompter.entity;
 
 
 import jakarta.persistence.Column;

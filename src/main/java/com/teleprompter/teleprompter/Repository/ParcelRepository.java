@@ -1,9 +1,9 @@
-package com.teleprompter.teleprompter.Repository;
+package com.teleprompter.teleprompter.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.teleprompter.teleprompter.Entity.Parcel;
+import com.teleprompter.teleprompter.entity.Parcel;
 
 @Repository
 public interface ParcelRepository extends JpaRepository<Parcel, Long> {
