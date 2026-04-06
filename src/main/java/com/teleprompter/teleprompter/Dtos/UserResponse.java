@@ -2,6 +2,8 @@ package com.teleprompter.teleprompter.dtos;
 
 import java.util.UUID;
 
+import com.teleprompter.teleprompter.enums.UserStatus;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -19,6 +21,7 @@ public class UserResponse {
 	
 	private String phone;
 	
-	private String status;
+	private UserStatus status;   // Jackson इसे खुद-ब-खुद JSON में "ACTIVE" या "BANNED" स्ट्रिंग बना देगा
+	
 	
 }
