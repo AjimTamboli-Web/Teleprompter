@@ -3,8 +3,6 @@ package com.teleprompter.teleprompter.dtos;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-import com.teleprompter.teleprompter.entity.City;
-import com.teleprompter.teleprompter.entity.User;
 import com.teleprompter.teleprompter.enums.JourneyStatus;
 import com.teleprompter.teleprompter.enums.TransportMode;
 
@@ -17,11 +15,10 @@ public class JourneyResponse {
 
 	private Long id;
 	
-	private User traveler;
-	
-	private City sourceCity;
-	
-	private City destinationCity;
+	// Fixed Fields: Using safe nested Summary DTOs instead of raw entities
+	private TravelerSummaryResponse traveler;
+	private CitySummaryResponse sourceCity;
+	private CitySummaryResponse destinationCity;
 	
 	private LocalDateTime departureTime;
 	
