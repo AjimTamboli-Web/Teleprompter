@@ -38,6 +38,28 @@ public class ParcelMapper {
 		return response;
 	}
 
+       public Parcel toEntity(CreateParcelRequest request) {
+		
+		if(request == null) {
+			return null;
+		}
+		
+		Parcel parcel = new Parcel();
+		
+		parcel.setCategory(request.getCategory());
+		parcel.setDescription(request.getDescription());
+		
+		// uses Defense-in-Depth instead of "trust the boundary" to save the unboxing risk Boolean to boolean
+		parcel.setFragile(request.getFragile() != null && request.getFragile());
+		parcel.setRestrictedItemsDeclared(request.getRestrictedItemsDeclared() != null && request.getRestrictedItemsDeclared());
+		parcel.setPhotoUrl(request.getPhotoUrl());
+		parcel.setValue(request.getValue());
+		parcel.setWeight(request.getWeight());
+		
+		
+		return parcel;
+	}
+	
 	
 	/**
      * Private helper to cleanly isolate the User -> SenderSummaryResponse mapping.
