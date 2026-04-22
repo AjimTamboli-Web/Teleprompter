@@ -1,6 +1,7 @@
 package com.teleprompter.teleprompter.service;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.teleprompter.teleprompter.dtos.CreateParcelRequest;
 import com.teleprompter.teleprompter.dtos.ParcelMapper;
@@ -10,11 +11,11 @@ import com.teleprompter.teleprompter.entity.User;
 import com.teleprompter.teleprompter.repository.ParcelRepository;
 import com.teleprompter.teleprompter.repository.UserRepository;
 
-import jakarta.transaction.Transactional;
+
 
 
 @Service
-public class ParcelServiceImpl implements ParcelService{
+public class ParcelServiceImpl{
 
 	
 	 // Final dependencies for immutability and guaranteed initialization
@@ -30,39 +31,33 @@ public class ParcelServiceImpl implements ParcelService{
 		this.parcelMap = parcelMap;
 		this.parcelRepo = parcelRepo;
 		this.userRepo = userRepo;
+		
 	}
 	
 	
-	@Override
+	
 	@Transactional   // Ensures the entire creation process runs inside a database transaction boundary
 	public ParcelResponse createParcel(CreateParcelRequest request) {
-		
-		 // 1. Database Verification: Check if the sender exists in our system
+	
+		 // 1. Database Verification: Core business check before logic execution
 		User sender = userRepo.findById(request.getSenderId())
-						.orElseThrow(() -> new RuntimeException("Sender not found with Id"));
+				    .orElseThrow(() -> new RuntimeException("Sender not found with ID: " + request.getSenderId()));
 		
-		 // 2. Mapping: Create a detached Parcel entity from the validated DTO fields
-		Parcel parcel = new Parcel();
 		
-		parcel.setCategory(request.getCategory());
-		parcel.setDescription(request.getDescription());
-		parcel.setFragile(request.getFragile());
-		parcel.setPhotoUrl(request.getPhotoUrl());
-		parcel.setValue(request.getValue());
-		parcel.setRestrictedItemsDeclared(request.getRestrictedItemsDeclared());
-		parcel.setWeight(request.getWeight());
+		 // 2. Mapping: FIXED! Delegating incoming DTO -> Entity conversion to the Mapper	
+	      Parcel parcel =	parcelMap.toEntity(request);
 		
-		 // Business Rule Exception: Business states a new parcel starts as 'AWAITING_MATCH'
-        // parcel.setStatus(ParcelStatus.AWAITING_MATCH); // (Add this once your ParcelStatus enum is active)
-		
-		 // 3. Attach Relationship: Set the verified User entity as the sender
-		parcel.setSender(sender);
-		
-		 // 4. Persistence: Save the complete entity to PostgreSQL
-		Parcel saveParcel = parcelRepo.save(parcel);
-		
-		// 5. Outbound Transformation: Map the managed entity back to clean ParcelResponse
-		return parcelMap.toResponse(saveParcel);
+	      
+	      // 3. Attach Relationship: Service handles the database-linked assignment 
+	      parcel.setSender(sender);
+	      
+	      // 4. Persistence: Write the managed entity to PostgreSQL
+	      Parcel savedParcel = parcelRepo.save(parcel);
+	     
+	      // 5. Outbound Transformation: Return shaped data to the controller boundary
+	      return parcelMap.toResponse(savedParcel);
+	      
+	      
 	}
 
 }
