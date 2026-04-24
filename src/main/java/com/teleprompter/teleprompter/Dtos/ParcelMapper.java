@@ -1,5 +1,7 @@
 package com.teleprompter.teleprompter.dtos;
 
+import java.util.Objects;
+
 import org.springframework.stereotype.Component;
 
 import com.teleprompter.teleprompter.entity.Parcel;
@@ -50,8 +52,13 @@ public class ParcelMapper {
 		parcel.setDescription(request.getDescription());
 		
 		// uses Defense-in-Depth instead of "trust the boundary" to save the unboxing risk Boolean to boolean
-		parcel.setFragile(request.getFragile() != null && request.getFragile());
-		parcel.setRestrictedItemsDeclared(request.getRestrictedItemsDeclared() != null && request.getRestrictedItemsDeclared());
+//		parcel.setFragile(request.getFragile() != null && request.getFragile());
+//		parcel.setRestrictedItemsDeclared(request.getRestrictedItemsDeclared() != null && request.getRestrictedItemsDeclared());
+	
+		// Fail fast guard using in-build tools
+		parcel.setFragile(Objects.requireNonNull(request.getFragile(), "Fragile field must not be null"));
+		parcel.setRestrictedItemsDeclared(Objects.requireNonNull(request.getRestrictedItemsDeclared(), "restrictedItems must not be null"));
+		
 		parcel.setPhotoUrl(request.getPhotoUrl());
 		parcel.setValue(request.getValue());
 		parcel.setWeight(request.getWeight());
