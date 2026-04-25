@@ -1,5 +1,7 @@
 package com.teleprompter.teleprompter.service;
 
+import java.util.Optional;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -58,6 +60,17 @@ public class ParcelServiceImpl{
 	      return parcelMap.toResponse(savedParcel);
 	      
 	      
+	}
+	
+	@Transactional(readOnly = true)
+	public ParcelResponse getParcelById(Long id) {
+		
+		Optional<Parcel> byId =  parcelRepo.findById(id);
+			
+		Parcel parce = byId.get();
+		
+		return  parcelMap.toResponse(parce);
+		
 	}
 
 }
