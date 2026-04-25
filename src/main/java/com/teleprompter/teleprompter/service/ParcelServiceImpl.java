@@ -1,7 +1,5 @@
 package com.teleprompter.teleprompter.service;
 
-import java.util.Optional;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -62,14 +60,20 @@ public class ParcelServiceImpl{
 	      
 	}
 	
-	@Transactional(readOnly = true)
+	@Transactional(readOnly = true) // Tells Hibernate to skip heavy dirty-checking workflows
 	public ParcelResponse getParcelById(Long id) {
 		
-		Optional<Parcel> byId =  parcelRepo.findById(id);
-			
-		Parcel parce = byId.get();
+		if(id == null) {
+			throw new IllegalArgumentException("\"Technical Failure: Search ID must not be null.\"");
+		}
 		
-		return  parcelMap.toResponse(parce);
+		// FIXED: Using direct orElseThrow functional chaining with detailed context message
+		Parcel parcel = parcelRepo.findById(id)
+				.orElseThrow(() -> new RuntimeException("Parcel not found with ID: " + id));
+		
+		
+		// 2. Outbound Transformation: Return safe shaped data to the boundary
+		return  parcelMap.toResponse(parcel);
 		
 	}
 
