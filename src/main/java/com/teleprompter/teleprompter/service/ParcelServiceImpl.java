@@ -1,8 +1,8 @@
 package com.teleprompter.teleprompter.service;
 
-import java.util.List;
-import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -80,11 +80,26 @@ public class ParcelServiceImpl{
 		
 	}
 	
+	
+	 /**
+      * Fetches all parcels using strict server-side pagination (Pageable).
+      * Skips heavy Hibernate dirty-checking comparison workflows via readOnly flag.
+     */
 	@Transactional(readOnly = true)
-	public List<ParcelResponse> getAllParcels(){
-		return parcelRepo.findAll().stream()
-				.map(parcelMap::toResponse)
-				.collect(Collectors.toList());
+	public Page<ParcelResponse> getAllParcels(Pageable pageable){		
+		
+		if(pageable == null) {
+			throw new IllegalArgumentException("Technical Failure: Pageable configuration must not be null.");
+		}
+		
+		
+		// 1. Data Access: Fetching the chunk of entities + automatic count query via Spring Data JPA
+		Page<Parcel> parcelPage = parcelRepo.findAll(pageable);
+		
+		// 2. Transformation: Safe transformation preserving all pagination metadata
+        // We use method reference 'parcelMapper::toResponse' for clean functional style
+	    return 	parcelPage.map(parcelMap::toResponse);
+		
 	}
 	
 
