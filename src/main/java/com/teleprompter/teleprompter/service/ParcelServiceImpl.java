@@ -1,5 +1,8 @@
 package com.teleprompter.teleprompter.service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -63,7 +66,7 @@ public class ParcelServiceImpl{
 	@Transactional(readOnly = true) // Tells Hibernate to skip heavy dirty-checking workflows
 	public ParcelResponse getParcelById(Long id) {
 		
-		if(id == null) {
+		if(id == null) {  // if id is null then instead of NPE it passed with IllegealArgumentException immediately fail-fast
 			throw new IllegalArgumentException("\"Technical Failure: Search ID must not be null.\"");
 		}
 		
@@ -76,5 +79,13 @@ public class ParcelServiceImpl{
 		return  parcelMap.toResponse(parcel);
 		
 	}
+	
+	@Transactional(readOnly = true)
+	public List<ParcelResponse> getAllParcels(){
+		return parcelRepo.findAll().stream()
+				.map(parcelMap::toResponse)
+				.collect(Collectors.toList());
+	}
+	
 
 }
