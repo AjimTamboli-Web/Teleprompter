@@ -102,5 +102,16 @@ public class ParcelServiceImpl{
 		
 	}
 	
+	@Transactional
+	public ParcelResponse updateParcel(Long id, CreateParcelRequest request) {
+		Parcel parcel = parcelRepo.findById(id)
+				.orElseThrow(() -> new RuntimeException("id not found.."));
+		
+		parcel.setDescription(request.getDescription());
+		parcel.setCategory(request.getCategory());
+		
+		return parcelMap.toResponse(parcelRepo.save(parcel));
+	}
+	
 
 }
