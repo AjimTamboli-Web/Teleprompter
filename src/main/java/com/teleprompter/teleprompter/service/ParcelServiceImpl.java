@@ -102,7 +102,8 @@ public class ParcelServiceImpl{
 		
 	}
 	
-	@Transactional
+	@Transactional             // naive code because we pass null values to other fields and override all values 
+	// and we have to ensure that which update we want to use PUT or PATCH
 	public ParcelResponse updateParcel(Long id, CreateParcelRequest request) {
 		Parcel parcel = parcelRepo.findById(id)
 				.orElseThrow(() -> new RuntimeException("id not found.."));
@@ -110,8 +111,11 @@ public class ParcelServiceImpl{
 		parcel.setDescription(request.getDescription());
 		parcel.setCategory(request.getCategory());
 		
-		return parcelMap.toResponse(parcelRepo.save(parcel));
+		return parcelMap.toResponse(parcelRepo.save(parcel));   // unintended full overwrite
 	}
+	
+	
+	
 	
 
 }
