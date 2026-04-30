@@ -140,5 +140,15 @@ public class ParcelServiceImpl{
 	}
 	
 	
+	@Transactional
+	public void deleteParcel(Long id) {  // using fetch first approach to avoid EmptyResultDataAccessException
+		
+		Parcel  parcel = parcelRepo.findById(id)
+				.orElseThrow(() -> new RuntimeException("Parcel not found, Id: " + id));
+		
+		
+		parcelRepo.delete(parcel);
+		
+	}
 
 }
