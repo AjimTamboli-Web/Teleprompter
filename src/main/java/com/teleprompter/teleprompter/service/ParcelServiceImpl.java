@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.teleprompter.teleprompter.dtos.CreateParcelRequest;
 import com.teleprompter.teleprompter.dtos.ParcelMapper;
 import com.teleprompter.teleprompter.dtos.ParcelResponse;
+import com.teleprompter.teleprompter.dtos.UpdateParcelRequest;
 import com.teleprompter.teleprompter.entity.Parcel;
 import com.teleprompter.teleprompter.entity.User;
 import com.teleprompter.teleprompter.repository.ParcelRepository;
@@ -102,19 +103,41 @@ public class ParcelServiceImpl{
 		
 	}
 	
-	@Transactional             // naive code because we pass null values to other fields and override all values 
-	// and we have to ensure that which update we want to use PUT or PATCH
-	public ParcelResponse updateParcel(Long id, CreateParcelRequest request) {
+	@Transactional          
+	public ParcelResponse updateParcel(Long id, UpdateParcelRequest request) {
+		
 		Parcel parcel = parcelRepo.findById(id)
-				.orElseThrow(() -> new RuntimeException("id not found.."));
+				.orElseThrow(() -> new RuntimeException("Parcel not found.."));
 		
-		parcel.setDescription(request.getDescription());
-		parcel.setCategory(request.getCategory());
+//		Partial update logic (Null-check-per-Field Pattern)
+		if(request.getWeight()  != null) {
+			parcel.setWeight(request.getWeight());
+		}
+		if(request.getValue() != null) {
+			parcel.setValue(request.getValue());
+		}
+		if(request.getPhotoUrl() != null) {
+			parcel.setPhotoUrl(request.getPhotoUrl());
+		}
+		if(request.getDescription() != null) {
+			parcel.setDescription(request.getDescription());
+		}
+		if(request.getCategory() != null) {
+			parcel.setCategory(request.getCategory());
+		}
+		if(request.getRestrictedItemsDeclared() != null) {
+			parcel.setRestrictedItemsDeclared(request.getRestrictedItemsDeclared());
+		}
+		if(request.getFragile() != null) {
+			parcel.setFragile(request.getFragile());
+		}
 		
-		return parcelMap.toResponse(parcelRepo.save(parcel));   // unintended full overwrite
+//		save updated entity into database
+		Parcel updateParcel = parcelRepo.save(parcel);
+		
+//		Using pure mapper convert into response and return
+		return parcelMap.toResponse(updateParcel);  
 	}
-	
-	
 	
 	
 
