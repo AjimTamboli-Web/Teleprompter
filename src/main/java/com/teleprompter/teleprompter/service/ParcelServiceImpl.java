@@ -141,13 +141,24 @@ public class ParcelServiceImpl{
 	
 	
 	@Transactional
-	public void deleteParcel(Long id) {  // using fetch first approach to avoid EmptyResultDataAccessException
+	public void deleteParcel(Long id) {  
 		
+//		Fetch the parcel first; throw a customized error if the ID does not exist
 		Parcel  parcel = parcelRepo.findById(id)
 				.orElseThrow(() -> new RuntimeException("Parcel not found, Id: " + id));
 		
+		 /* 
+	     * TODO: [Temporary Hard-Delete Placeholder] 
+	     * Currently, the ParcelStatus enum and DeliveryRequest table do not exist, 
+	     * so a physical hard-delete is safe for now.
+	     * if (deliveryRequestRepo.existsByParcelId(id)) { 
+         * throw new RuntimeException("can not delete current parcel"); 
+	     * As soon as ParcelStatus (e.g., CANCELLED) is introduced in the next session, 
+	     * this hard-delete will be replaced with a status transition and active delivery checks.
+	     */
 		
-		parcelRepo.delete(parcel);
+//		Pass the entity object to the repository's delete method   
+		parcelRepo.delete(parcel);// hard deleting for now 
 		
 	}
 
