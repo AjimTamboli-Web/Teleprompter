@@ -12,6 +12,7 @@ import com.teleprompter.teleprompter.dtos.ParcelResponse;
 import com.teleprompter.teleprompter.dtos.UpdateParcelRequest;
 import com.teleprompter.teleprompter.entity.Parcel;
 import com.teleprompter.teleprompter.entity.User;
+import com.teleprompter.teleprompter.enums.ParcelStatus;
 import com.teleprompter.teleprompter.repository.ParcelRepository;
 import com.teleprompter.teleprompter.repository.UserRepository;
 
@@ -51,6 +52,7 @@ public class ParcelServiceImpl{
 		 // 2. Mapping: FIXED! Delegating incoming DTO -> Entity conversion to the Mapper	
 	      Parcel parcel =	parcelMap.toEntity(request);
 		
+	      	parcel.setStatus(ParcelStatus.AWAITING_MATCH);
 	      
 	      // 3. Attach Relationship: Service handles the database-linked assignment 
 	      parcel.setSender(sender);
