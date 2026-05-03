@@ -3,10 +3,12 @@ package com.teleprompter.teleprompter.entity;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import com.teleprompter.teleprompter.enums.ParcelCategory;
+import com.teleprompter.teleprompter.enums.ParcelStatus;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -64,6 +66,9 @@ public class Parcel {
 	@UpdateTimestamp
 	private LocalDateTime updatedAt;
 	
-	
+	@Enumerated(EnumType.STRING)
+	@Column(nullable = false)
+	@ColumnDefault("'AWAITING_MATCH'")
+	private ParcelStatus status ;
 	
 }
