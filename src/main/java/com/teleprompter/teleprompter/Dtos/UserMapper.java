@@ -43,7 +43,6 @@ public class UserMapper {
 		
 		user.setEmail(request.getEmail());
 		user.setName(request.getName());
-//		user.setPasswordHash(request.getPassword()); // passwordHash intentionally NOT set here — hashing is a security concern, handled exclusively in the service layer
 		user.setPhone(request.getPhone());
 		
 		return user;
