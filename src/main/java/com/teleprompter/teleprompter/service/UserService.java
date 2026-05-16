@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.teleprompter.teleprompter.dtos.RegisterUserRequest;
 import com.teleprompter.teleprompter.dtos.UserMapper;
 import com.teleprompter.teleprompter.dtos.UserResponse;
+import com.teleprompter.teleprompter.entity.User;
 import com.teleprompter.teleprompter.repository.UserRepository;
 
 @Service
@@ -27,12 +28,24 @@ public class UserService {
 	public UserResponse registerUser(RegisterUserRequest request) {
 		
 		
+		if(userRepo.existsByEmail(request.getEmail())) {
+			throw new RuntimeException("Email is already registered " + request.getEmail());
+		}
+		
+		if(userRepo.existsByPhone(request.getPhone())) {
+			throw new RuntimeException("Phone number is alredy registered " + request.getPhone());
+		}
+		
+		User user = userMapper.toEntity(request);
+		
+		String hashedPassword = passwordEncoder.encode(request.getPassword());
+		user.setPasswordHash(hashedPassword);
+		
+		User userSaved = userRepo.save(user);
 		
 		
 		
-		
-		
-		return null;
+		return userMapper.toResponse(userSaved);
 	}
 	
 	
