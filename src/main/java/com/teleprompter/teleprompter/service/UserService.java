@@ -27,7 +27,7 @@ public class UserService {
 	@Transactional
 	public UserResponse registerUser(RegisterUserRequest request) {
 		
-		  // 1. Uniqueness pre-checks 
+		 
 		if(userRepo.existsByEmail(request.getEmail())) {
 			throw new RuntimeException("Email is already registered " + request.getEmail());
 		}
@@ -36,18 +36,18 @@ public class UserService {
 			throw new RuntimeException("Phone number is alredy registered " + request.getPhone());
 		}
 		
-		// 2. Structurally map DTO to Entity
+		
 		User user = userMapper.toEntity(request);
 		
-		 // 3. Security Intervention: Hash the raw password before it reaches the DB layer
+		
 		String hashedPassword = passwordEncoder.encode(request.getPassword());
 		user.setPasswordHash(hashedPassword);
 		
-		// 4. Save to the persistent store
+		
 		User userSaved = userRepo.save(user);
 		
 		
-		 // 5. Shape the persistent entity back into an external API response
+		 
 		return userMapper.toResponse(userSaved);
 	}
 	
