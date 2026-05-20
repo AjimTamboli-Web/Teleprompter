@@ -1,20 +1,18 @@
 package com.teleprompter.teleprompter.exception;
 
-import org.springframework.web.bind.annotation.RestControllerAdvice;
-
 import lombok.Getter;
-import lombok.Setter;
 
-@Getter @Setter
-public class DuplicateResourceException extends RuntimeException{
+@Getter
+public class DuplicateResourceException extends RuntimeException {
 
-	private final String fieldName;
 	private final String resourceName;
+	private final String fieldName;
 	private final Object fieldValue;
-	
-	public DuplicateResourceException(String fieldName, String resourceName, Object fieldValue) {
+
+	public DuplicateResourceException(String resourceName, String fieldName, Object fieldValue) {
+		super(String.format("%s already exists with %s : '%s'", resourceName, fieldName, fieldValue));
+		this.resourceName = resourceName;
 		this.fieldName = fieldName;
 		this.fieldValue = fieldValue;
-		this.resourceName = resourceName;
 	}
 }
