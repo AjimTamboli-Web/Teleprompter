@@ -13,35 +13,27 @@ import jakarta.servlet.http.HttpServletRequest;
 public class GlobalExceptionHandler {
 
 	@ExceptionHandler(ResourceNotFoundException.class)
-	public ResponseEntity<ErrorResponse> handleResourceNotFound(ResourceNotFoundException ex,HttpServletRequest request){
-		
+	public ResponseEntity<ErrorResponse> handleResourceNotFound(ResourceNotFoundException ex,
+			HttpServletRequest request) {
+
 		HttpStatus status = HttpStatus.NOT_FOUND;
-		
-		ErrorResponse errorResponse = new ErrorResponse(
-				LocalDateTime.now(),
-				status.value(),
-				status.getReasonPhrase(),
-				ex.getMessage(),
-				request.getRequestURI()
-				);
-		
-		return new ResponseEntity<>(errorResponse,status);
-	}
-	
-	@ExceptionHandler(DuplicateResourceException.class)
-	public ResponseEntity<ErrorResponse> handleDuplicateResource(DuplicateResourceException ex,HttpServletRequest request){
-		
-		HttpStatus status = HttpStatus.CONFLICT;
-		
-		ErrorResponse errorResponse = new ErrorResponse(
-				LocalDateTime.now(),
-				status.value(),
-				status.getReasonPhrase(),
-				ex.getMessage(),
-				request.getRequestURI()
-				);
-		
+
+		ErrorResponse errorResponse = new ErrorResponse(LocalDateTime.now(), status.value(), status.getReasonPhrase(),
+				ex.getMessage(), request.getRequestURI());
+
 		return new ResponseEntity<>(errorResponse, status);
 	}
-	
+
+	@ExceptionHandler(DuplicateResourceException.class)
+	public ResponseEntity<ErrorResponse> handleDuplicateResource(DuplicateResourceException ex,
+			HttpServletRequest request) {
+
+		HttpStatus status = HttpStatus.CONFLICT;
+
+		ErrorResponse errorResponse = new ErrorResponse(LocalDateTime.now(), status.value(), status.getReasonPhrase(),
+				ex.getMessage(), request.getRequestURI());
+
+		return new ResponseEntity<>(errorResponse, status);
+	}
+
 }
