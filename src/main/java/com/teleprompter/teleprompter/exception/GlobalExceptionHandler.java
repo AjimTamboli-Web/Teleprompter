@@ -16,24 +16,24 @@ public class GlobalExceptionHandler {
 	public ResponseEntity<ErrorResponse> handleResourceNotFound(ResourceNotFoundException ex,
 			HttpServletRequest request) {
 
-		HttpStatus status = HttpStatus.NOT_FOUND;
-
-		ErrorResponse errorResponse = new ErrorResponse(LocalDateTime.now(), status.value(), status.getReasonPhrase(),
-				ex.getMessage(), request.getRequestURI());
-
-		return new ResponseEntity<>(errorResponse, status);
+		return buildErrorResponse(HttpStatus.NOT_FOUND, ex.getMessage(), request);
+	
 	}
 
 	@ExceptionHandler(DuplicateResourceException.class)
 	public ResponseEntity<ErrorResponse> handleDuplicateResource(DuplicateResourceException ex,
 			HttpServletRequest request) {
 
-		HttpStatus status = HttpStatus.CONFLICT;
-
-		ErrorResponse errorResponse = new ErrorResponse(LocalDateTime.now(), status.value(), status.getReasonPhrase(),
-				ex.getMessage(), request.getRequestURI());
-
-		return new ResponseEntity<>(errorResponse, status);
+		return buildErrorResponse(HttpStatus.CONFLICT, ex.getMessage(), request);
+	}
+	
+	// extracted private method /  rule of DRY 
+	private ResponseEntity<ErrorResponse> buildErrorResponse(HttpStatus status, String message, HttpServletRequest request){
+		
+		ErrorResponse errorResponse = new ErrorResponse(LocalDateTime.now(),status.value(), status.getReasonPhrase(),
+				message, request.getRequestURI());
+		
+		return new ResponseEntity<>(errorResponse,status);
 	}
 
 }
