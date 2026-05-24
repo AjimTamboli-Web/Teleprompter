@@ -8,6 +8,7 @@ import com.teleprompter.teleprompter.dtos.RegisterUserRequest;
 import com.teleprompter.teleprompter.dtos.UserMapper;
 import com.teleprompter.teleprompter.dtos.UserResponse;
 import com.teleprompter.teleprompter.entity.User;
+import com.teleprompter.teleprompter.exception.DuplicateResourceException;
 import com.teleprompter.teleprompter.repository.UserRepository;
 
 @Service
@@ -17,7 +18,7 @@ public class UserService {
 		private final UserMapper userMapper;
 		private final PasswordEncoder passwordEncoder;
 	
-//		constructor injection for all dependencies
+
 	public UserService(UserRepository repo, UserMapper mapper, PasswordEncoder passwordEncoder) {
 		this.userMapper = mapper;
 		this.userRepo = repo;
@@ -29,11 +30,11 @@ public class UserService {
 		
 		 
 		if(userRepo.existsByEmail(request.getEmail())) {
-			throw new RuntimeException("Email is already registered " + request.getEmail());
+			throw new DuplicateResourceException("User","email",request.getEmail());
 		}
 		
 		if(userRepo.existsByPhone(request.getPhone())) {
-			throw new RuntimeException("Phone number is alredy registered " + request.getPhone());
+			throw new DuplicateResourceException("User","phone",request.getPhone());
 		}
 		
 		
