@@ -17,7 +17,7 @@ public class GlobalExceptionHandler {
 			HttpServletRequest request) {
 
 		return buildErrorResponse(HttpStatus.NOT_FOUND, ex.getMessage(), request);
-	
+
 	}
 
 	@ExceptionHandler(DuplicateResourceException.class)
@@ -26,14 +26,15 @@ public class GlobalExceptionHandler {
 
 		return buildErrorResponse(HttpStatus.CONFLICT, ex.getMessage(), request);
 	}
-	
-	// extracted private method /  rule of DRY 
-	private ResponseEntity<ErrorResponse> buildErrorResponse(HttpStatus status, String message, HttpServletRequest request){
-		
-		ErrorResponse errorResponse = new ErrorResponse(LocalDateTime.now(),status.value(), status.getReasonPhrase(),
+
+	// extracted private method / rule of DRY
+	private ResponseEntity<ErrorResponse> buildErrorResponse(HttpStatus status, String message,
+			HttpServletRequest request) {
+
+		ErrorResponse errorResponse = new ErrorResponse(LocalDateTime.now(), status.value(), status.getReasonPhrase(),
 				message, request.getRequestURI());
-		
-		return new ResponseEntity<>(errorResponse,status);
+
+		return new ResponseEntity<>(errorResponse, status);
 	}
 
 }
