@@ -13,6 +13,7 @@ import com.teleprompter.teleprompter.dtos.UpdateParcelRequest;
 import com.teleprompter.teleprompter.entity.Parcel;
 import com.teleprompter.teleprompter.entity.User;
 import com.teleprompter.teleprompter.enums.ParcelStatus;
+import com.teleprompter.teleprompter.exception.ResourceNotFoundException;
 import com.teleprompter.teleprompter.repository.ParcelRepository;
 import com.teleprompter.teleprompter.repository.UserRepository;
 
@@ -46,7 +47,7 @@ public class ParcelServiceImpl{
 	
 		 // 1. Database Verification: Core business check before logic execution
 		User sender = userRepo.findById(request.getSenderId())
-				    .orElseThrow(() -> new RuntimeException("Sender not found with ID: " + request.getSenderId()));
+				    .orElseThrow(() -> new ResourceNotFoundException("User","id",request.getSenderId()));
 		
 		
 		 // 2. Mapping: FIXED! Delegating incoming DTO -> Entity conversion to the Mapper	
@@ -70,15 +71,15 @@ public class ParcelServiceImpl{
 	public ParcelResponse getParcelById(Long id) {
 		
 		if(id == null) {  // if id is null then instead of NPE it passed with IllegealArgumentException immediately fail-fast
-			throw new IllegalArgumentException("\"Technical Failure: Search ID must not be null.\"");
+			throw new IllegalArgumentException("Technical Failure: Search ID must not be null.");
 		}
 		
-		// FIXED: Using direct orElseThrow functional chaining with detailed context message
+		// Using direct orElseThrow functional chaining with detailed context message
 		Parcel parcel = parcelRepo.findById(id)
-				.orElseThrow(() -> new RuntimeException("Parcel not found with ID: " + id));
+				.orElseThrow(() -> new ResourceNotFoundException("Parcel","id",id));
 		
 		
-		// 2. Outbound Transformation: Return safe shaped data to the boundary
+		// Outbound Transformation: Return safe shaped data to the boundary
 		return  parcelMap.toResponse(parcel);
 		
 	}
@@ -109,7 +110,7 @@ public class ParcelServiceImpl{
 	public ParcelResponse updateParcel(Long id, UpdateParcelRequest request) {
 		
 		Parcel parcel = parcelRepo.findById(id)
-				.orElseThrow(() -> new RuntimeException("Parcel not found.."));
+				.orElseThrow(() -> new ResourceNotFoundException("Parcel","id",id));
 		
 //		Partial update logic (Null-check-per-Field Pattern)
 		if(request.getWeight()  != null) {
@@ -147,7 +148,7 @@ public class ParcelServiceImpl{
 		
 //		Fetch the parcel first; throw a customized error if the ID does not exist
 		Parcel  parcel = parcelRepo.findById(id)
-				.orElseThrow(() -> new RuntimeException("Parcel not found, Id: " + id));
+				.orElseThrow(() -> new ResourceNotFoundException("Parcel","id",id));
 		
 		 /* 
 	     * TODO: [Temporary Hard-Delete Placeholder] 
