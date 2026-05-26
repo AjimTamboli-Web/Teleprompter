@@ -27,6 +27,12 @@ public class GlobalExceptionHandler {
 		return buildErrorResponse(HttpStatus.CONFLICT, ex.getMessage(), request);
 	}
 
+	@ExceptionHandler(InvalidCredentialsException.class)  // new 401 handler
+	public ResponseEntity<ErrorResponse> handleInvalidCredentials(InvalidCredentialsException ex, HttpServletRequest request){
+		
+		return buildErrorResponse(HttpStatus.UNAUTHORIZED,ex.getMessage(),request);
+	}
+	
 	// extracted private method / rule of DRY
 	private ResponseEntity<ErrorResponse> buildErrorResponse(HttpStatus status, String message,
 			HttpServletRequest request) {
