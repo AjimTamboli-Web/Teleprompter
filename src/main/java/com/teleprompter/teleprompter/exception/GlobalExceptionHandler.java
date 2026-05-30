@@ -54,12 +54,12 @@ public class GlobalExceptionHandler {
 		
 		Map<String, String> errors = new HashMap<>();
 		
-		// gathering(putting) all error fields into the Map Collection 
+		
 		for(FieldError fieldError : ex.getBindingResult().getFieldErrors()) {
 			errors.put(fieldError.getField(), fieldError.getDefaultMessage());
 		}
 		
-		// returning 400 bad request with structural response 
+		
 		ValidationErrorResponse errorResponse = new ValidationErrorResponse(
 				LocalDateTime.now(),
 				HttpStatus.BAD_REQUEST.value(),
