@@ -9,7 +9,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
-@EnableWebSecurity
+@EnableWebSecurity // no need to add because spring boot work automatically we do in manually in spring 
 public class SecurityConfig {
 
 	@Bean
