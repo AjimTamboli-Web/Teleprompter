@@ -3,7 +3,6 @@ package com.teleprompter.teleprompter.entity;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-
 import org.hibernate.annotations.ColumnDefault;
 
 import com.teleprompter.teleprompter.enums.JourneyStatus;
@@ -25,14 +24,11 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Setter   @Getter
-@Table(name = "journey",
-	   indexes = {
-			   // 'पुणे -> मुंबई + तारीख' सर्च को फ़ास्ट करने के लिए कंपोजिट इंडेक्स (Equality फ़ील्ड्स पहले, Range बाद में)
-			   @Index(name = "idx_journey_search", columnList = "source_city_id, destination_city_id, departure_time"),
-	   
-	           // "Show my journeys" के लिए traveler_id पर इंडेक्स (PostgreSQL ऑटो-इंडेक्स नहीं करता)
-                 @Index(name = "idx_journey_traveler", columnList = "traveler_id")  }  )
+@Setter
+@Getter
+@Table(name = "journey", indexes = {
+		@Index(name = "idx_journey_search", columnList = "source_city_id, destination_city_id, departure_time"),
+		@Index(name = "idx_journey_traveler", columnList = "traveler_id") })
 public class Journey {
 
 //	Journey — id BIGINT PK, traveler_id FK→User, source_city_id FK→City, 
@@ -40,43 +36,42 @@ public class Journey {
 //	max_weight_capacity DECIMAL(6,2), available_weight_capacity DECIMAL(6,2), 
 //	transport_mode VARCHAR(20), status VARCHAR(20) DEFAULT 'PUBLISHED' 
 //	(PUBLISHED/IN_PROGRESS/COMPLETED/CANCELLED)
-	
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	
+
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "traveler_id", nullable = false)
 	private User traveler;
-	
+
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "source_city_id", nullable = false)
 	private City sourceCity;
-	
+
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "destination_city_id", nullable = false)
 	private City destinationCity;
-	
+
 	@Column(nullable = false)
 	private LocalDateTime departureTime;
-	
+
 	@Column(nullable = false)
 	private LocalDateTime estimatedArrivalTime;
-	
-	 // precision=6, scale=2 that is means maximum 9999.99 this is a bug
+
+	// precision=6, scale=2 that is means maximum 9999.99 this is a bug
 	@Column(precision = 6, scale = 2, nullable = false)
 	private BigDecimal maxWeightCapacity;
-	
+
 	@Column(precision = 6, scale = 2, nullable = false)
 	private BigDecimal availableWeightCapacity;
-	
+
 	@Enumerated(EnumType.STRING)
 	@Column(length = 20, nullable = false)
 	private TransportMode transportMode;
-	
+
 	@ColumnDefault("'PUBLISHED'")
 	@Column(length = 20, nullable = false)
 	@Enumerated(EnumType.STRING)
 	private JourneyStatus status = JourneyStatus.PUBLISHED;
 }
-
