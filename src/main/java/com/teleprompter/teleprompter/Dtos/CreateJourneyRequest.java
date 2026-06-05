@@ -6,7 +6,9 @@ import java.util.UUID;
 
 import com.teleprompter.teleprompter.enums.TransportMode;
 
+import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
@@ -31,6 +33,8 @@ public class CreateJourneyRequest {
 	
 	@NotNull
 	@DecimalMin(value = "0.1")
+	@DecimalMax(value = "9999.99")
+	@Digits(integer = 4, fraction = 2)
 	private BigDecimal maxWeightCapacity;
 	
 	@NotNull
