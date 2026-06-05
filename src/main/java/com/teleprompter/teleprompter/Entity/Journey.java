@@ -59,7 +59,7 @@ public class Journey {
 	@Column(nullable = false)
 	private LocalDateTime estimatedArrivalTime;
 
-	// precision=6, scale=2 that is means maximum 9999.99 this is a bug
+	
 	@Column(precision = 6, scale = 2, nullable = false)
 	private BigDecimal maxWeightCapacity;
 
