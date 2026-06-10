@@ -9,6 +9,7 @@ import com.teleprompter.teleprompter.enums.TransportMode;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Digits;
+import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,6 +17,8 @@ import lombok.Setter;
 @Getter  @Setter
 public class CreateJourneyRequest {
 
+	// TODO: Temporary scaffolding. Remove once JWT authentication is implemented.
+	// The travelerId must come from the authenticated principal to prevent IDOR / Broken Access Control vulnerabilities.
 	@NotNull
 	private UUID travelerId;
 	
@@ -26,7 +29,8 @@ public class CreateJourneyRequest {
 	private Long destinationCityId;
 	
 	@NotNull
-	private LocalDateTime departureTime;
+	@Future(message = "Departure time must be in the future") //it checks that a date/time is after the current moment
+	private LocalDateTime departureTime; // it blocks "journeys in the past" at the entrance, before any service logic runs
 	
 	@NotNull
 	private LocalDateTime estimatedArrivalTime;
