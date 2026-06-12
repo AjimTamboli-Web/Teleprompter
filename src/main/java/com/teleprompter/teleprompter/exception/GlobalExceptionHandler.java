@@ -37,6 +37,12 @@ public class GlobalExceptionHandler {
 		return buildErrorResponse(HttpStatus.UNAUTHORIZED,ex.getMessage(),request);
 	}
 	
+	@ExceptionHandler(BusinessRuleViolationException.class)
+	public ResponseEntity<ErrorResponse> handleBusinessRuleViolation(BusinessRuleViolationException ex, HttpServletRequest request){
+		
+		return buildErrorResponse(HttpStatus.UNPROCESSABLE_CONTENT,ex.getMessage(),request);
+	}
+	
 	
 	// extracted private method / rule of DRY
 	private ResponseEntity<ErrorResponse> buildErrorResponse(HttpStatus status, String message,
