@@ -34,7 +34,7 @@ public class JourneyService {
 				.orElseThrow(() -> new ResourceNotFoundException("User","id",request.getTravelerId()));
 		
 		if(traveler.getStatus() != UserStatus.ACTIVE) {
-			throw new BusinessRuleViolationException("Traveler account is not active, Current status: " + traveler.getStatus());
+			throw new BusinessRuleViolationException("Traveler account is not eligible to publish journeys");
 		}
 		
 		return null;
