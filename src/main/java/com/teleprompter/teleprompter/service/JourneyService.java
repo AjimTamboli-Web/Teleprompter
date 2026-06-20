@@ -1,5 +1,7 @@
 package com.teleprompter.teleprompter.service;
 
+import java.util.Objects;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,6 +32,21 @@ public class JourneyService {
 	@Transactional
 	public JourneyResponse publishJourney(CreateJourneyRequest request) {
 
+		// [FAIL FAST] : Low-cost checks at the top, without any DB queries.
+		
+		// Cross-field business rule - both
+		// Using Objects.equals() to safely compare Long objects.
+		if(Objects.equals(request.getSourceCityId(), request.getDestinationCityId())) {
+			throw new BusinessRuleViolationException("Source and destination cities must be different");
+		}
+		
+		// Timeline check (will fail even if equal, because .isAfter() checks only for "strictly greater")
+		if(!request.getEstimatedArrivalTime().isAfter(request.getDepartureTime())) {
+			throw new BusinessRuleViolationException("Arrival time must be strictly after the departure time.");
+		}
+		
+		// [Database Operations]: Heavy and expensive checks will begin after this.
+		
 		User traveler = userRepository.findById(request.getTravelerId())
 				.orElseThrow(() -> new ResourceNotFoundException("User", "id", request.getTravelerId()));
 
