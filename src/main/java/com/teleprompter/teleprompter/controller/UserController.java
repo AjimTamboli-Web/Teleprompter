@@ -28,6 +28,8 @@ public class UserController {
 		
 		UserResponse response = userService.registerUser(request);
 		
+		 // TODO: Add Location header
+		
 		return ResponseEntity.status(HttpStatus.CREATED).body(response);
 	}
 
