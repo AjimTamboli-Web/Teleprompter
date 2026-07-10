@@ -46,6 +46,8 @@ public class GlobalExceptionHandler {
 		return buildErrorResponse(HttpStatus.UNPROCESSABLE_CONTENT, ex.getMessage(), request);
 	}
 
+//  This handler is designed to catch invalid JSON formats, incorrect data types or invalid Enum values ​​sent by the client,
+//	  thereby preventing the leakage of internal server information and ensuring a clean "400 Bad Request" response.
 	@ExceptionHandler(HttpMessageNotReadableException.class)
 	public ResponseEntity<ErrorResponse> handleHttpMessageNotReadable(HttpMessageNotReadableException ex, 
 			HttpServletRequest request){
