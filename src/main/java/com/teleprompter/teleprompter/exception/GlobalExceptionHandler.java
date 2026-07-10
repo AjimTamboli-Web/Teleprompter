@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -31,16 +32,28 @@ public class GlobalExceptionHandler {
 		return buildErrorResponse(HttpStatus.CONFLICT, ex.getMessage(), request);
 	}
 
-	@ExceptionHandler(InvalidCredentialsException.class)  // new 401 handler
-	public ResponseEntity<ErrorResponse> handleInvalidCredentials(InvalidCredentialsException ex, HttpServletRequest request){
-		
-		return buildErrorResponse(HttpStatus.UNAUTHORIZED,ex.getMessage(),request);
+	@ExceptionHandler(InvalidCredentialsException.class) // new 401 handler
+	public ResponseEntity<ErrorResponse> handleInvalidCredentials(InvalidCredentialsException ex,
+			HttpServletRequest request) {
+
+		return buildErrorResponse(HttpStatus.UNAUTHORIZED, ex.getMessage(), request);
 	}
-	
+
 	@ExceptionHandler(BusinessRuleViolationException.class)
-	public ResponseEntity<ErrorResponse> handleBusinessRuleViolation(BusinessRuleViolationException ex, HttpServletRequest request){
+	public ResponseEntity<ErrorResponse> handleBusinessRuleViolation(BusinessRuleViolationException ex,
+			HttpServletRequest request) {
+
+		return buildErrorResponse(HttpStatus.UNPROCESSABLE_CONTENT, ex.getMessage(), request);
+	}
+
+	@ExceptionHandler(HttpMessageNotReadableException.class)
+	public ResponseEntity<ErrorResponse> handleHttpMessageNotReadable(HttpMessageNotReadableException ex, 
+			HttpServletRequest request){
 		
-		return buildErrorResponse(HttpStatus.UNPROCESSABLE_CONTENT,ex.getMessage(),request);
+		// own fix instead of ex.getMessage() for security,
+		String safeMessage = "Required request body is missing or contains invalid data formats.";
+		
+		return buildErrorResponse(HttpStatus.BAD_REQUEST, safeMessage, request);
 	}
 	
 	
@@ -53,30 +66,22 @@ public class GlobalExceptionHandler {
 
 		return new ResponseEntity<>(errorResponse, status);
 	}
-	
+
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	public ResponseEntity<ValidationErrorResponse> handleValidationError(MethodArgumentNotValidException ex,
 			HttpServletRequest request) {
-		
+
 		Map<String, String> errors = new HashMap<>();
-		
-		
-		for(FieldError fieldError : ex.getBindingResult().getFieldErrors()) {
+
+		for (FieldError fieldError : ex.getBindingResult().getFieldErrors()) {
 			errors.put(fieldError.getField(), fieldError.getDefaultMessage());
 		}
-		
-		
-		ValidationErrorResponse errorResponse = new ValidationErrorResponse(
-				LocalDateTime.now(),
-				HttpStatus.BAD_REQUEST.value(),
-				HttpStatus.BAD_REQUEST.getReasonPhrase(),
-				errors,
-				request.getRequestURI()
-				);
-		
+
+		ValidationErrorResponse errorResponse = new ValidationErrorResponse(LocalDateTime.now(),
+				HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.getReasonPhrase(), errors,
+				request.getRequestURI());
+
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
 	}
-	
-	
 
 }
