@@ -19,7 +19,10 @@ import com.teleprompter.teleprompter.repository.CityRepository;
 import com.teleprompter.teleprompter.repository.JourneyRepository;
 import com.teleprompter.teleprompter.repository.UserRepository;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Service
+@Slf4j   // Lombok annotation that creates a 'log' field in the background
 public class JourneyService {
 
 	private final JourneyRepository journeyRepository;
@@ -77,6 +80,9 @@ public class JourneyService {
 		// Inserting records into the database (INSERT) and response mapping
 		Journey saved = journeyRepository.save(journey);
 
+//		 Safe parameterized INFO log line
+		log.info("Journey successfully published with ID: {}", saved.getId());
+		
 		// Sending back a clean response without leaking the entity.
 		return journeyMapper.toResponse(saved);
 	}
