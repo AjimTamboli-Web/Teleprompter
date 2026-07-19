@@ -87,4 +87,18 @@ public class JourneyService {
 		return journeyMapper.toResponse(saved);
 	}
 
+	/**
+     * Fetches a single journey by its ID and safely maps it to a DTO 
+     * while the Hibernate session is open to prevent lazy loading failures.
+     */
+	@Transactional(readOnly = true)  // Fix: readOnly = true for read optimization
+	public JourneyResponse getJourneyById(Long id) {
+		
+		Journey journey = journeyRepository.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException("Journey","id", id));
+			
+//		Returning a DTO by performing secure mapping within the transaction itself
+		return journeyMapper.toResponse(journey);
+	}
+	
 }
