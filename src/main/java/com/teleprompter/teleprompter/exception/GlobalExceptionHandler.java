@@ -47,8 +47,7 @@ public class GlobalExceptionHandler {
 		return buildErrorResponse(HttpStatus.UNPROCESSABLE_CONTENT, ex.getMessage(), request);
 	}
 
-//  This handler is designed to catch invalid JSON formats, incorrect data types or invalid Enum values ​​sent by the client,
-//	  thereby preventing the leakage of internal server information and ensuring a clean "400 Bad Request" response.
+
 	@ExceptionHandler(HttpMessageNotReadableException.class)
 	public ResponseEntity<ErrorResponse> handleHttpMessageNotReadable(HttpMessageNotReadableException ex,
 			HttpServletRequest request) {
@@ -59,13 +58,11 @@ public class GlobalExceptionHandler {
 		return buildErrorResponse(HttpStatus.BAD_REQUEST, safeMessage, request);
 	}
 
-// This handler was written to prevent the leakage of internal server information when a client sends an incorrect 
-//	data type (such as "abc" instead of a number) in the URL path or parameters, and to ensure the client receives a clear "400 Bad Request" response in a consistent format.	
 	@ExceptionHandler(MethodArgumentTypeMismatchException.class)
 	public ResponseEntity<ErrorResponse> handleMethodArgumentTypeMismatch(MethodArgumentTypeMismatchException ex,
 			HttpServletRequest request) {
 //		 Using ex.getName() gives the frontend developer a clear hint that the issue lies in the 'id' field.
-		String safeMessage = String.format("The parameter '%s' contains an invalid data format", ex.getName());
+		String safeMessage = String.format("The parameter '%s' contains an invalid data format.", ex.getName());
 
 		return buildErrorResponse(HttpStatus.BAD_REQUEST, safeMessage, request);
 	}
