@@ -42,9 +42,6 @@ public class JourneyController {
 		// ResponseEntity.created(uri) sets status 201 and the Location header simultaneously.
 		return ResponseEntity.created(location).body(responseBody);
 		
-//		return ResponseEntity
-//				.status(HttpStatus.CREATED)
-//				.body(responseBody);
 	}
 	
 	@GetMapping("/{id}")
