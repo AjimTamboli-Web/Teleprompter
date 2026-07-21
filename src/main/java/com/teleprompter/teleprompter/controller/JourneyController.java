@@ -1,5 +1,7 @@
 package com.teleprompter.teleprompter.controller;
 
+import java.net.URI;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -8,6 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.teleprompter.teleprompter.dtos.CreateJourneyRequest;
 import com.teleprompter.teleprompter.dtos.JourneyResponse;
@@ -30,11 +33,18 @@ public class JourneyController {
 		
 		JourneyResponse responseBody = journeyService.publishJourney(request);
 		
-		 // TODO: Add Location header once GET /api/journeys/{id} is implemented.
-        // We cannot supply a broken or non-existent URI in the response headers for now.
-		return ResponseEntity
-				.status(HttpStatus.CREATED)
-				.body(responseBody);
+		URI location = ServletUriComponentsBuilder
+		        .fromCurrentRequest()          // starts from the URL of this POST: /api/books
+		        .path("/{id}")                 // appends a template variable
+		        .buildAndExpand(responseBody.getId()) // fills {id} with the real value
+		        .toUri();
+
+		// ResponseEntity.created(uri) sets status 201 and the Location header simultaneously.
+		return ResponseEntity.created(location).body(responseBody);
+		
+//		return ResponseEntity
+//				.status(HttpStatus.CREATED)
+//				.body(responseBody);
 	}
 	
 	@GetMapping("/{id}")
