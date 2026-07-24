@@ -15,18 +15,20 @@ import com.teleprompter.teleprompter.enums.JourneyStatus;
 @Repository
 public interface JourneyRepository extends JpaRepository<Journey, Long> {
 
-	 /**
-     * Finds all published journeys filtering by source, destination, date range, and capacity.
-     * Uses explicit JPQL named parameters to fully prevent SQL injection.
+	/**
+     * Searches for published journeys with available capacity using a half-open date interval.
+     * Includes a primary key tie-breaker in ORDER BY to guarantee stable pagination results.
      */
-	@Query("SELECT j FROM Journey j " + 
-			"WHERE j.sourceCity.id = :sourceCityId " +
-			"AND j.destinationCity.id = :destinationCityId " + 
-			"AND j.departureTime >= :fromTime " + 
-			"AND j.departureTime <  :toTime " +
-			"AND j.status = :status " +
-			"AND j.availableWeightCapacity > 0 " +      // Direct comparison of BigDecimal with 0 is valid in JPQL.
-			"ORDER BY j.departureTime ASC")            //  Earliest trip first
+	@Query("""    
+			SELECT j FROM Journey j 
+			WHERE j.sourceCity.id = :sourceCityId  
+			AND j.destinationCity.id = :destinationCityId 
+			AND j.departureTime >= :fromTime 
+			AND j.departureTime <  :toTime 
+			AND j.status = :status 
+			AND j.availableWeightCapacity > 0    
+			ORDER BY j.departureTime ASC, j.id ASC    // [FIX]: Added j.id ASC to ensure stable pagination.
+			""")  // Java 17 also offers the option of text blocks ("""), which are cleaner and easier to read.          
 	Page<Journey> searchJourney(@Param("sourceCityId") Long sourceCityId, 
 								@Param("destinationCityId") Long destinationCityId, 
 								@Param("fromTime") LocalDateTime fromTime,
