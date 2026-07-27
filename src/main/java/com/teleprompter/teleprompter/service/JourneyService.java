@@ -1,7 +1,11 @@
 package com.teleprompter.teleprompter.service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,7 +26,7 @@ import com.teleprompter.teleprompter.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
-@Slf4j   // Lombok annotation that creates a 'log' field in the background
+@Slf4j // Lombok annotation that creates a 'log' field in the background
 public class JourneyService {
 
 	private final JourneyRepository journeyRepository;
@@ -82,23 +86,43 @@ public class JourneyService {
 
 //		 Safe parameterized INFO log line
 		log.info("Journey successfully published with ID: {}", saved.getId());
-		
+
 		// Sending back a clean response without leaking the entity.
 		return journeyMapper.toResponse(saved);
 	}
 
 	/**
-     * Fetches a single journey by its ID and safely maps it to a DTO 
-     * while the Hibernate session is open to prevent lazy loading failures.
-     */
-	@Transactional(readOnly = true)  // Fix: readOnly = true for read optimization
+	 * Fetches a single journey by its ID and safely maps it to a DTO while the
+	 * Hibernate session is open to prevent lazy loading failures.
+	 */
+	@Transactional(readOnly = true) // Fix: readOnly = true for read optimization
 	public JourneyResponse getJourneyById(Long id) {
-		
+
 		Journey journey = journeyRepository.findById(id)
-				.orElseThrow(() -> new ResourceNotFoundException("Journey","id", id));
-			
+				.orElseThrow(() -> new ResourceNotFoundException("Journey", "id", id));
+
 //		Returning a DTO by performing secure mapping within the transaction itself
 		return journeyMapper.toResponse(journey);
 	}
-	
+
+	 /**
+     * Searches for active, published journeys matching the route and date range.
+     * Translates a single LocalDate into a clean, half-open LocalDateTime 24-hour interval.
+     */
+	@Transactional(readOnly = true)
+	public Page<JourneyResponse> searchJourneys(Long sourceCityId, Long destinationCityId, LocalDate date,
+			Pageable pageable) {
+
+//		Translation of a date into a half-open 24-hour interval
+		LocalDateTime fromTime = date.atStartOfDay();     // Today at 00:00
+		LocalDateTime toTime = date.plusDays(1).atStartOfDay();  // Tomorrow morning 00:00
+
+		Page<Journey> journeyPage = journeyRepository.searchJourney(sourceCityId, destinationCityId, fromTime, toTime,
+				JourneyStatus.PUBLISHED, pageable);
+
+//	    Converting entities to DTOs while preserving pagination metadata using lambda 
+		return journeyPage.map(journey -> journeyMapper.toResponse(journey)); // here you can also use method reference
+
+	}
+
 }
