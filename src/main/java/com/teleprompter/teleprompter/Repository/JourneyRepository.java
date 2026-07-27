@@ -19,6 +19,7 @@ public interface JourneyRepository extends JpaRepository<Journey, Long> {
      * Searches for published journeys with available capacity using a half-open date interval.
      * Includes a primary key tie-breaker in ORDER BY to guarantee stable pagination results.
      */
+	// [FIX]: Added j.id ASC to ensure stable pagination. // Java 17 also offers the option of text blocks ("""), which are cleaner and easier to read. 
 	@Query("""    
 			SELECT j FROM Journey j 
 			WHERE j.sourceCity.id = :sourceCityId  
@@ -27,8 +28,8 @@ public interface JourneyRepository extends JpaRepository<Journey, Long> {
 			AND j.departureTime <  :toTime 
 			AND j.status = :status 
 			AND j.availableWeightCapacity > 0    
-			ORDER BY j.departureTime ASC, j.id ASC    // [FIX]: Added j.id ASC to ensure stable pagination.
-			""")  // Java 17 also offers the option of text blocks ("""), which are cleaner and easier to read.          
+			ORDER BY j.departureTime ASC, j.id ASC    
+			""") 
 	Page<Journey> searchJourney(@Param("sourceCityId") Long sourceCityId, 
 								@Param("destinationCityId") Long destinationCityId, 
 								@Param("fromTime") LocalDateTime fromTime,
