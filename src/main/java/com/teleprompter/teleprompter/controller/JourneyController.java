@@ -27,6 +27,10 @@ import jakarta.validation.Valid;
 @RequestMapping("/api/journeys")
 public class JourneyController {
 
+
+	// A constant cap has been set to protect the server from heavy load
+	private static final int MAX_PAGE_SIZE = 50;
+	
 	private final JourneyService journeyService;
 
 	public JourneyController(JourneyService journeyService) {
@@ -58,15 +62,21 @@ public class JourneyController {
 	}
 	
 	
+	 /**
+     * Endpoint to search for published journeys with pagination and filters.
+     * Maps to GET /api/journeys
+     */
 	@GetMapping
 	public ResponseEntity<Page<JourneyResponse>> searchJourneys(@RequestParam Long sourceCityId,
 																@RequestParam Long destinationCityId,
 																@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
 																@RequestParam(defaultValue = "0") int page,
 																@RequestParam(defaultValue = "10") int size){
-		
-		int sanitizedSize = Math.min(size, 50);
+
+		// Capping the size at a maximum of 50 for server security
+		int sanitizedSize = Math.min(size, MAX_PAGE_SIZE);
 		 
+//		 Sorting is handled by the service/repository, so we will only pass the index here
 		Pageable pageable = PageRequest.of(page, sanitizedSize);
 		
 		Page<JourneyResponse> results = journeyService.searchJourneys(sourceCityId, destinationCityId, date, pageable);
