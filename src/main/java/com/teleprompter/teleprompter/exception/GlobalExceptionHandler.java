@@ -48,7 +48,6 @@ public class GlobalExceptionHandler {
 		return buildErrorResponse(HttpStatus.UNPROCESSABLE_CONTENT, ex.getMessage(), request);
 	}
 
-
 	@ExceptionHandler(HttpMessageNotReadableException.class)
 	public ResponseEntity<ErrorResponse> handleHttpMessageNotReadable(HttpMessageNotReadableException ex,
 			HttpServletRequest request) {
@@ -62,24 +61,20 @@ public class GlobalExceptionHandler {
 	@ExceptionHandler(MethodArgumentTypeMismatchException.class)
 	public ResponseEntity<ErrorResponse> handleMethodArgumentTypeMismatch(MethodArgumentTypeMismatchException ex,
 			HttpServletRequest request) {
-//		 Using ex.getName() gives the frontend developer a clear hint that the issue lies in the 'id' field.
+
 		String safeMessage = String.format("The parameter '%s' contains an invalid data format.", ex.getName());
 
 		return buildErrorResponse(HttpStatus.BAD_REQUEST, safeMessage, request);
 	}
-	
-	 /**
-     * Handles missing query parameters cleanly without leaking internal framework details.
-     * Extracts the parameter name safely using ex.getParameterName().
-     */
+
 	@ExceptionHandler(MissingServletRequestParameterException.class)
-	public ResponseEntity<ErrorResponse> handleMissingServletRequestParameter(MissingServletRequestParameterException ex, 
-			HttpServletRequest request){
-		
+	public ResponseEntity<ErrorResponse> handleMissingServletRequestParameter(
+			MissingServletRequestParameterException ex, HttpServletRequest request) {
+
 		String safeMessage = "Required request parameter '" + ex.getParameterName() + "' is missing.";
-	
-		return buildErrorResponse(HttpStatus.BAD_REQUEST,safeMessage,request);
-		
+
+		return buildErrorResponse(HttpStatus.BAD_REQUEST, safeMessage, request);
+
 	}
 
 	// extracted private method / rule of DRY
@@ -109,6 +104,4 @@ public class GlobalExceptionHandler {
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
 	}
 
-	
-	
 }
