@@ -73,7 +73,7 @@ public class JourneyController {
 																@RequestParam(defaultValue = "0") int page,
 																@RequestParam(defaultValue = "10") int size){
 
-		// Capping the size at a maximum of 50 for server security
+		// Capping the maximum page size for server security
 		int sanitizedSize = Math.min(size, MAX_PAGE_SIZE);
 		 
 //		 Sorting is handled by the service/repository, so we will only pass the index here
