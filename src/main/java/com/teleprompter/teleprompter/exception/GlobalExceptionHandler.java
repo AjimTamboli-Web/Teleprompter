@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
@@ -66,6 +67,20 @@ public class GlobalExceptionHandler {
 
 		return buildErrorResponse(HttpStatus.BAD_REQUEST, safeMessage, request);
 	}
+	
+	 /**
+     * Handles missing query parameters cleanly without leaking internal framework details.
+     * Extracts the parameter name safely using ex.getParameterName().
+     */
+	@ExceptionHandler(MissingServletRequestParameterException.class)
+	public ResponseEntity<ErrorResponse> handleMissingServletRequestParameter(MissingServletRequestParameterException ex, 
+			HttpServletRequest request){
+		
+		String safeMessage = "Required request parameter '" + ex.getParameterName() + "' is missing.";
+	
+		return buildErrorResponse(HttpStatus.BAD_REQUEST,safeMessage,request);
+		
+	}
 
 	// extracted private method / rule of DRY
 	private ResponseEntity<ErrorResponse> buildErrorResponse(HttpStatus status, String message,
@@ -94,4 +109,6 @@ public class GlobalExceptionHandler {
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
 	}
 
+	
+	
 }
