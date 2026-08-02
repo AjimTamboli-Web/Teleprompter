@@ -22,6 +22,8 @@ import com.teleprompter.teleprompter.dtos.JourneyResponse;
 import com.teleprompter.teleprompter.service.JourneyService;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 
 @RestController
 @RequestMapping("/api/journeys")
@@ -63,21 +65,20 @@ public class JourneyController {
 	
 	
 	 /**
-     * Endpoint to search for published journeys with pagination and filters.
-     * Maps to GET /api/journeys
+     * Paginated search for journeys using explicit declarative parameter validation rules.
+     * Rejects out-of-bounds page or size requests directly at the API boundary layer.
      */
 	@GetMapping
 	public ResponseEntity<Page<JourneyResponse>> searchJourneys(@RequestParam Long sourceCityId,
 																@RequestParam Long destinationCityId,
 																@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
-																@RequestParam(defaultValue = "0") int page,
-																@RequestParam(defaultValue = "10") int size){
+																@RequestParam(defaultValue = "0") @Min(value = 0,message = "Page index must be greater than or equal to {value}.") int page,
+																@RequestParam(defaultValue = "10") @Min(value = 1,message = "Page size must be at least {value}.") @Max(value = MAX_PAGE_SIZE, message = "Page size cannot exceed {value}.") int size){
 
-		// Capping the maximum page size for server security
-		int sanitizedSize = Math.min(size, MAX_PAGE_SIZE);
+		 // [REDUNDANCY REMOVED]: Math.min is removed as constraints are now enforced via declarative architecture annotations.
 		 
-//		 Sorting is handled by the service/repository, so we will only pass the index here
-		Pageable pageable = PageRequest.of(page, sanitizedSize);
+
+		Pageable pageable = PageRequest.of(page, size);
 		
 		Page<JourneyResponse> results = journeyService.searchJourneys(sourceCityId, destinationCityId, date, pageable);
 		
