@@ -64,19 +64,12 @@ public class JourneyController {
 	}
 	
 	
-	 /**
-     * Paginated search for journeys using explicit declarative parameter validation rules.
-     * Rejects out-of-bounds page or size requests directly at the API boundary layer.
-     */
 	@GetMapping
 	public ResponseEntity<Page<JourneyResponse>> searchJourneys(@RequestParam Long sourceCityId,
 																@RequestParam Long destinationCityId,
 																@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
 																@RequestParam(defaultValue = "0") @Min(value = 0,message = "Page index must be greater than or equal to {value}.") int page,
 																@RequestParam(defaultValue = "10") @Min(value = 1,message = "Page size must be at least {value}.") @Max(value = MAX_PAGE_SIZE, message = "Page size cannot exceed {value}.") int size){
-
-		 // [REDUNDANCY REMOVED]: Math.min is removed as constraints are now enforced via declarative architecture annotations.
-		 
 
 		Pageable pageable = PageRequest.of(page, size);
 		
