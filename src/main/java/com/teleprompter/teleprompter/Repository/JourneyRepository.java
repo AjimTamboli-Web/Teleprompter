@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -19,7 +20,9 @@ public interface JourneyRepository extends JpaRepository<Journey, Long> {
      * Searches for published journeys with available capacity using a half-open date interval.
      * Includes a primary key tie-breaker in ORDER BY to guarantee stable pagination results.
      */
-	// [FIX]: Added j.id ASC to ensure stable pagination. // Java 17 also offers the option of text blocks ("""), which are cleaner and easier to read. 
+
+	// @EntityGraph specifies which lazy relationships should be loaded along with the entity
+	@EntityGraph(attributePaths = {"traveler","sourceCity","destinationCity"})
 	@Query("""    
 			SELECT j FROM Journey j 
 			WHERE j.sourceCity.id = :sourceCityId  
