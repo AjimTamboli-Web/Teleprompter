@@ -105,17 +105,18 @@ public class JourneyService {
 		return journeyMapper.toResponse(journey);
 	}
 
-	 /**
-     * Searches for active, published journeys matching the route and date range.
-     * Translates a single LocalDate into a clean, half-open LocalDateTime 24-hour interval.
-     */
+	/**
+	 * Searches for active, published journeys matching the route and date range.
+	 * Translates a single LocalDate into a clean, half-open LocalDateTime 24-hour
+	 * interval.
+	 */
 	@Transactional(readOnly = true)
 	public Page<JourneyResponse> searchJourneys(Long sourceCityId, Long destinationCityId, LocalDate date,
 			Pageable pageable) {
 
 //		Translation of a date into a half-open 24-hour interval
-		LocalDateTime fromTime = date.atStartOfDay();     // Today at 00:00
-		LocalDateTime toTime = date.plusDays(1).atStartOfDay();  // Tomorrow morning 00:00
+		LocalDateTime fromTime = date.atStartOfDay(); // Today at 00:00
+		LocalDateTime toTime = date.plusDays(1).atStartOfDay(); // Tomorrow morning 00:00
 
 		Page<Journey> journeyPage = journeyRepository.searchJourney(sourceCityId, destinationCityId, fromTime, toTime,
 				JourneyStatus.PUBLISHED, pageable);
@@ -123,6 +124,26 @@ public class JourneyService {
 //	    Converting entities to DTOs while preserving pagination metadata using lambda 
 		return journeyPage.map(journey -> journeyMapper.toResponse(journey)); // here you can also use method reference
 
+	}
+
+	@Transactional
+	public JourneyResponse cancelJourney(Long id) {
+
+		Journey journey = journeyRepository.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException("Journey", "id", id));
+
+		/*
+		 * TODO : Owner check (only the journey's traveler may cancel) comes with JWT
+		 * TODO : Pending delivery requests must also be cancelled once DeliveryRequest exists
+		 */
+		
+//		ENUM state machine called
+		JourneyStatus targetStatus = journey.getStatus().transitionTo(JourneyStatus.CANCELLED);
+
+//		Only setter called, No repository.save() needed
+		journey.setStatus(targetStatus);
+
+		return journeyMapper.toResponse(journey);
 	}
 
 }
