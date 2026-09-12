@@ -79,4 +79,11 @@ public class JourneyController {
 		
 	}
 
+	@PostMapping("/{id}/cancel")
+	public ResponseEntity<JourneyResponse> cancelJourney(@PathVariable Long id){
+		
+		JourneyResponse updatedJourney = journeyService.cancelJourney(id);
+		
+		return ResponseEntity.ok(updatedJourney);
+	}
 }
