@@ -1,5 +1,7 @@
 package com.teleprompter.teleprompter.service;
 
+import java.time.LocalDateTime;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,6 +48,13 @@ public class DeliveryRequestService {
 			throw new BusinessRuleViolationException("Journey must be in PUBLISHES status.");
 		}
 
+		// Rule 3:Past Validation
+		if(journey.getDepartureTime().isBefore(LocalDateTime.now())) {
+			throw new BusinessRuleViolationException("Cannot request a journey that has already departed.");
+		}
+		
+		
+		
 		return null;
 	}
 
