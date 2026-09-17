@@ -1,6 +1,7 @@
 package com.teleprompter.teleprompter.service;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -53,6 +54,13 @@ public class DeliveryRequestService {
 			throw new BusinessRuleViolationException("Cannot request a journey that has already departed.");
 		}
 		
+		// Rule 4: Route match validation 
+//		if(!Objects.equals(parcel.getId(), journey.getSourceCity().getId()))
+		
+		// Rule 5: Weight capacity filter
+		if(parcel.getWeight().compareTo(journey.getAvailableWeightCapacity()) > 0) {
+			throw new BusinessRuleViolationException("Parcel weight exceeds the journey's available capacity.");
+		}
 		
 		
 		return null;
