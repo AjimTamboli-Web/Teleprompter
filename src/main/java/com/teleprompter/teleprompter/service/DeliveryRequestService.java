@@ -62,6 +62,11 @@ public class DeliveryRequestService {
 			throw new BusinessRuleViolationException("Parcel weight exceeds the journey's available capacity.");
 		}
 		
+		// Rule 6: Self-request block
+		// TODO: Owner check (validate that authenticated user actually owns this parcel) comes with JWT
+		if(Objects.equals(parcel.getSender().getId(), journey.getTraveler().getId())) {
+			throw new BusinessRuleViolationException("Sender cannot request their own journey.");
+		}
 		
 		return null;
 	}
