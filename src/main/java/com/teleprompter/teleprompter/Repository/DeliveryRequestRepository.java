@@ -8,6 +8,8 @@ import com.teleprompter.teleprompter.entity.DeliveryRequest;
 @Repository
 public interface DeliveryRequestRepository extends JpaRepository<DeliveryRequest, Long> {
 
-	boolean existsByParcelIdAndJourneyId(Long parcelId, Long journeyId);
+	
+	boolean existsByParcelIdAndJourneyId(Long parcelId, Long journeyId); 
+	
 	
 }

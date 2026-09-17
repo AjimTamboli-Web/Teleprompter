@@ -13,6 +13,7 @@ import com.teleprompter.teleprompter.entity.Parcel;
 import com.teleprompter.teleprompter.enums.JourneyStatus;
 import com.teleprompter.teleprompter.enums.ParcelStatus;
 import com.teleprompter.teleprompter.exception.BusinessRuleViolationException;
+import com.teleprompter.teleprompter.exception.DuplicateResourceException;
 import com.teleprompter.teleprompter.exception.ResourceNotFoundException;
 import com.teleprompter.teleprompter.repository.DeliveryRequestRepository;
 import com.teleprompter.teleprompter.repository.JourneyRepository;
@@ -68,6 +69,10 @@ public class DeliveryRequestService {
 			throw new BusinessRuleViolationException("Sender cannot request their own journey.");
 		}
 		
+		// Rule 7: Duplicate pre-check
+		if(deliveryRequestRepo.existsByParcelIdAndJourneyId(request.getParcelId(), request.getJourneyId())) {
+			throw new DuplicateResourceException("delivery","id", request);
+		}
 		return null;
 	}
 
