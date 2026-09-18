@@ -3,6 +3,8 @@ package com.teleprompter.teleprompter.service;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +26,8 @@ import com.teleprompter.teleprompter.repository.ParcelRepository;
 @Service
 public class DeliveryRequestService {
 
+	private static final Logger log = LoggerFactory.getLogger(DeliveryRequestService.class);
+	
 	private final DeliveryRequestRepository deliveryRequestRepo;
 	private final ParcelRepository parcelRepo;
 	private final JourneyRepository journeyRepo;
@@ -88,6 +92,8 @@ public class DeliveryRequestService {
 		
 		DeliveryRequest savedRequest = deliveryRequestRepo.save(deliveryRequest);
 		
+		// Added a log line at INFO level, with the request id only.
+		log.info("Delivery request created with id: {}", savedRequest.getId());
 		
 		return deliveryMapper.toResponse(savedRequest);
 	}
