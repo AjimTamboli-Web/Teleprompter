@@ -7,7 +7,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.teleprompter.teleprompter.dtos.CreateDeliveryRequest;
+import com.teleprompter.teleprompter.dtos.DeliveryRequestMapper;
 import com.teleprompter.teleprompter.dtos.DeliveryRequestResponse;
+import com.teleprompter.teleprompter.entity.DeliveryRequest;
 import com.teleprompter.teleprompter.entity.Journey;
 import com.teleprompter.teleprompter.entity.Parcel;
 import com.teleprompter.teleprompter.enums.JourneyStatus;
@@ -25,12 +27,14 @@ public class DeliveryRequestService {
 	private final DeliveryRequestRepository deliveryRequestRepo;
 	private final ParcelRepository parcelRepo;
 	private final JourneyRepository journeyRepo;
-
+	private final DeliveryRequestMapper deliveryMapper;
+	
 	public DeliveryRequestService(DeliveryRequestRepository deliveryRequestRepo, ParcelRepository parcelRepo,
-			JourneyRepository journeyRepo) {
+			JourneyRepository journeyRepo, DeliveryRequestMapper mapper) {
 		this.deliveryRequestRepo = deliveryRequestRepo;
 		this.parcelRepo = parcelRepo;
 		this.journeyRepo = journeyRepo;
+		this.deliveryMapper = mapper;
 	}
 
 	@Transactional
@@ -73,7 +77,19 @@ public class DeliveryRequestService {
 		if(deliveryRequestRepo.existsByParcelIdAndJourneyId(request.getParcelId(), request.getJourneyId())) {
 			throw new DuplicateResourceException("delivery","id", request);
 		}
-		return null;
+		
+		// Mapping fields and copying addresses (since they are @NotBlank in DTO)
+		DeliveryRequest deliveryRequest = new DeliveryRequest();
+		
+		deliveryRequest.setParcel(parcel);
+		deliveryRequest.setJourney(journey);
+		deliveryRequest.setPickupAddress(request.getPickupAddress());
+		deliveryRequest.setDropAddress(request.getDropAddress());
+		
+		DeliveryRequest savedRequest = deliveryRequestRepo.save(deliveryRequest);
+		
+		
+		return deliveryMapper.toResponse(savedRequest);
 	}
 
 }
