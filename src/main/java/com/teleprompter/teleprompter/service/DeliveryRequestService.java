@@ -92,4 +92,13 @@ public class DeliveryRequestService {
 		return deliveryMapper.toResponse(savedRequest);
 	}
 
+	@Transactional(readOnly = true) // skip dirty checking 
+	public DeliveryRequestResponse getDeliveryRequestById(Long id) {   // we can use as a Location header at endpoint
+		
+		DeliveryRequest request = deliveryRequestRepo.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException("DeliveryRequest","id",id));
+		
+		return deliveryMapper.toResponse(request);
+	}
+	
 }
