@@ -1,5 +1,7 @@
 package com.teleprompter.teleprompter.controller;
 
+import java.net.URI;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -8,6 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.teleprompter.teleprompter.dtos.CreateDeliveryRequest;
 import com.teleprompter.teleprompter.dtos.DeliveryRequestResponse;
@@ -28,9 +31,14 @@ public class DeliveryRequestController {
 	@PostMapping
 	public ResponseEntity<DeliveryRequestResponse> createRequest(@Valid @RequestBody CreateDeliveryRequest request){
 		
-		DeliveryRequestResponse response = requestService.createDeliveryRequest(request);
+		DeliveryRequestResponse responseBody = requestService.createDeliveryRequest(request);
 		
-		return ResponseEntity.status(HttpStatus.CREATED).body(response);
+		URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+				   .path("/{id}")
+				   .buildAndExpand(responseBody.getId())
+				   .toUri();
+		
+		return ResponseEntity.created(location).body(responseBody);
 		
 	}
 	
