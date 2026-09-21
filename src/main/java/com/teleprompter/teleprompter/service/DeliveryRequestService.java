@@ -64,10 +64,10 @@ public class DeliveryRequestService {
 		}
 		
 		// Rule 4: Route match validation (Symmetrical validation using refactored fields!)
-//		if(!Objects.equals(parcel.getSourceCity().getId(), journey.getSourceCity().getId()) ||
-//			!Objects.equals(parcel.getDestinationCity().getId(), journey.getDestinationCity().getId())) {
-//			throw new BusinessRuleViolationException("Parcel route does not match journey route.");
-//		}
+		if(!Objects.equals(parcel.getSourceCity().getId(), journey.getSourceCity().getId()) ||
+			!Objects.equals(parcel.getDestinationCity().getId(), journey.getDestinationCity().getId())) {
+			throw new BusinessRuleViolationException("Parcel route does not match journey route.");
+		}
 		
 		// Rule 5: Weight capacity filter
 		if(parcel.getWeight().compareTo(journey.getAvailableWeightCapacity()) > 0) {
