@@ -55,7 +55,7 @@ public class DeliveryRequestService {
 		Journey journey = journeyRepo.findById(request.getJourneyId())
 				.orElseThrow(() -> new ResourceNotFoundException("Journey", "id", request.getJourneyId()));
 		if (journey.getStatus() != JourneyStatus.PUBLISHED) {
-			throw new BusinessRuleViolationException("Journey must be in PUBLISHES status.");
+			throw new BusinessRuleViolationException("Journey must be in PUBLISHED status.");
 		}
 
 		// Rule 3:Past Validation
@@ -79,7 +79,7 @@ public class DeliveryRequestService {
 		
 		// Rule 7: Duplicate pre-check
 		if(deliveryRequestRepo.existsByParcelIdAndJourneyId(request.getParcelId(), request.getJourneyId())) {
-			throw new DuplicateResourceException("delivery","id", request);
+			throw new DuplicateResourceException("Delivery","parcelId & journeyId", request.getParcelId() + " " + request.getJourneyId());
 		}
 		
 		// Mapping fields and copying addresses (since they are @NotBlank in DTO)
