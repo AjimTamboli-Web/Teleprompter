@@ -56,7 +56,8 @@ public class DeliveryRequestMapper {
 		summary.setFragile(parcel.isFragile());
 		summary.setPhotoUrl(parcel.getPhotoUrl());
 		summary.setCategory(parcel.getCategory());
-		
+		summary.setSourceCityId(parcel.getSourceCity().getId());
+		summary.setDestinationCityId(parcel.getDestinationCity().getId());
 		return summary;
 		
 	}

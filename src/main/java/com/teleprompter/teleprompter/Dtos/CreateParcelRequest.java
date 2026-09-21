@@ -12,7 +12,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
-@Getter  @Setter
+@Getter @Setter
 public class CreateParcelRequest {
 
 	@NotNull
@@ -41,7 +41,12 @@ public class CreateParcelRequest {
 	@NotNull
 	private ParcelCategory category;
 	
+	// Input validation for Route fields
+	@NotNull(message = "Source city ID is required.")
+	private Long sourceCityId;
 
+	@NotNull(message = "Destination city ID is required.")
+	private Long destinationCityId;
 	
 //	
 //	public Boolean getFragile() {

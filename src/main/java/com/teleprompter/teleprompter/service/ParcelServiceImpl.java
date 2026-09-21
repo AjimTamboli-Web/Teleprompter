@@ -10,10 +10,12 @@ import com.teleprompter.teleprompter.dtos.CreateParcelRequest;
 import com.teleprompter.teleprompter.dtos.ParcelMapper;
 import com.teleprompter.teleprompter.dtos.ParcelResponse;
 import com.teleprompter.teleprompter.dtos.UpdateParcelRequest;
+import com.teleprompter.teleprompter.entity.City;
 import com.teleprompter.teleprompter.entity.Parcel;
 import com.teleprompter.teleprompter.entity.User;
 import com.teleprompter.teleprompter.enums.ParcelStatus;
 import com.teleprompter.teleprompter.exception.ResourceNotFoundException;
+import com.teleprompter.teleprompter.repository.CityRepository;
 import com.teleprompter.teleprompter.repository.ParcelRepository;
 import com.teleprompter.teleprompter.repository.UserRepository;
 
@@ -28,16 +30,17 @@ public class ParcelServiceImpl{
 	private final ParcelRepository parcelRepo;
 	private final UserRepository userRepo;
 	private final ParcelMapper parcelMap;
+	private final CityRepository cityRepo;
 	
 	 /**
      * Constructor-based dependency injection.
      * Always preferred over @Autowired field injection for testing and safety.
      */
-	public ParcelServiceImpl(ParcelRepository parcelRepo, UserRepository userRepo, ParcelMapper parcelMap) {
+	public ParcelServiceImpl(ParcelRepository parcelRepo, UserRepository userRepo, ParcelMapper parcelMap, CityRepository cityRepo) {
 		this.parcelMap = parcelMap;
 		this.parcelRepo = parcelRepo;
 		this.userRepo = userRepo;
-		
+		this.cityRepo = cityRepo;
 	}
 	
 	
@@ -49,6 +52,11 @@ public class ParcelServiceImpl{
 		User sender = userRepo.findById(request.getSenderId())
 				    .orElseThrow(() -> new ResourceNotFoundException("User","id",request.getSenderId()));
 		
+		City sourceCity = cityRepo.findById(request.getSourceCityId())
+				.orElseThrow(() -> new ResourceNotFoundException("City","id",request.getSourceCityId()));
+		
+		City destinationCity = cityRepo.findById(request.getDestinationCityId())
+				.orElseThrow(() -> new ResourceNotFoundException("City","id", request.getDestinationCityId()));
 		
 		 // 2. Mapping: FIXED! Delegating incoming DTO -> Entity conversion to the Mapper	
 	      Parcel parcel =	parcelMap.toEntity(request);
@@ -57,6 +65,9 @@ public class ParcelServiceImpl{
 	      
 	      // 3. Attach Relationship: Service handles the database-linked assignment 
 	      parcel.setSender(sender);
+	      
+	      parcel.setSourceCity(sourceCity);
+	      parcel.setDestinationCity(destinationCity);
 	      
 	      // 4. Persistence: Write the managed entity to PostgreSQL
 	      Parcel savedParcel = parcelRepo.save(parcel);

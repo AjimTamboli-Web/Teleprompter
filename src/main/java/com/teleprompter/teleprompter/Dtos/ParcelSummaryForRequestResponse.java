@@ -23,7 +23,8 @@ public class ParcelSummaryForRequestResponse {
 	
 	private String photoUrl;
 	
-	
+	private Long sourceCityId;
+	private Long destinationCityId;
 	
 	
 }

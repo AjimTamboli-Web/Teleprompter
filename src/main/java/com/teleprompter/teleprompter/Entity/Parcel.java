@@ -36,6 +36,14 @@ public class Parcel {
 	@JoinColumn(name = "sender_id",nullable = false)
 	private User sender;
 	
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "source_city_id", nullable = false)
+	private City sourceCity;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "destination_city_id", nullable = false)
+	private City destinationCity;
+	
 	@Column(columnDefinition = "TEXT")
 	private String description;
 	

@@ -33,6 +33,9 @@ public class ParcelMapper {
 		response.setPhotoUrl(parcel.getPhotoUrl());
 		response.setCategory(parcel.getCategory());
 		
+		response.setSourceCityId(parcel.getSourceCity().getId());
+		response.setDestinationCityId(parcel.getDestinationCity().getId());
+		
 //		Mapping nested relationship using private helper
 		response.setSender(mapToSenderSummary(parcel.getSender()));
 		
