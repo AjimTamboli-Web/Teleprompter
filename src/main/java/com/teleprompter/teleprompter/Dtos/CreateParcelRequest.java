@@ -15,6 +15,7 @@ import lombok.Setter;
 @Getter @Setter
 public class CreateParcelRequest {
 
+	// TODO: Temporary scaffold for authentication bypass. Will move out of request body once JWT is active.
 	@NotNull
 	private UUID senderId;
 	
