@@ -19,7 +19,7 @@ public class UpdateParcelRequest {
 
 	private Boolean fragile;
 
-	@DecimalMin(value = "0.01")
+	@DecimalMin(value = "1.00")
 	private BigDecimal weight;
 
 	@DecimalMin(value = "0.0", inclusive = false)
