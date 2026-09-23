@@ -1,6 +1,8 @@
 package com.teleprompter.teleprompter.service;
 
 
+import java.util.Objects;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -14,6 +16,7 @@ import com.teleprompter.teleprompter.entity.City;
 import com.teleprompter.teleprompter.entity.Parcel;
 import com.teleprompter.teleprompter.entity.User;
 import com.teleprompter.teleprompter.enums.ParcelStatus;
+import com.teleprompter.teleprompter.exception.BusinessRuleViolationException;
 import com.teleprompter.teleprompter.exception.ResourceNotFoundException;
 import com.teleprompter.teleprompter.repository.CityRepository;
 import com.teleprompter.teleprompter.repository.ParcelRepository;
@@ -48,6 +51,11 @@ public class ParcelServiceImpl{
 	@Transactional   // Ensures the entire creation process runs inside a database transaction boundary
 	public ParcelResponse createParcel(CreateParcelRequest request) {
 	
+//		Same city check (Fail Fast)
+		if(Objects.equals(request.getSourceCityId(), request.getDestinationCityId())) {
+			throw new BusinessRuleViolationException("Source and destination cities must be different.");
+		}
+		
 		 // 1. Database Verification: Core business check before logic execution
 		User sender = userRepo.findById(request.getSenderId())
 				    .orElseThrow(() -> new ResourceNotFoundException("User","id",request.getSenderId()));
