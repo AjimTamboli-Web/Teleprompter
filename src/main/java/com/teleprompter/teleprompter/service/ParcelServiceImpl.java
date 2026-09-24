@@ -131,6 +131,12 @@ public class ParcelServiceImpl{
 		Parcel parcel = parcelRepo.findById(id)
 				.orElseThrow(() -> new ResourceNotFoundException("Parcel","id",id));
 		
+//		Status check (Only AWAITING_MATCH can be edited)
+		if(parcel.getStatus() != ParcelStatus.AWAITING_MATCH) {
+			throw new BusinessRuleViolationException("Only parcels in AWAITING_MATCH status can be modified.");
+		}
+		
+		
 //		Partial update logic (Null-check-per-Field Pattern)
 		if(request.getWeight()  != null) {
 			parcel.setWeight(request.getWeight());
@@ -154,11 +160,9 @@ public class ParcelServiceImpl{
 			parcel.setFragile(request.getFragile());
 		}
 		
-//		save updated entity into database
-		Parcel updateParcel = parcelRepo.save(parcel);
 		
-//		Using pure mapper convert into response and return
-		return parcelMap.toResponse(updateParcel);  
+//		 Dirty checking automatically saves changes, no repo.save() needed!
+		return parcelMap.toResponse(parcel);  
 	}
 	
 	
