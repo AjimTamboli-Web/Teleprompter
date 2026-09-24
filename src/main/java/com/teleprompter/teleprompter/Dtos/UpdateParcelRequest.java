@@ -34,7 +34,4 @@ public class UpdateParcelRequest {
 	
 	private Boolean restrictedItemsDeclared;
 	
-	private Long sourceCityId;
-	
-	private Long destinationCityId;
 }
