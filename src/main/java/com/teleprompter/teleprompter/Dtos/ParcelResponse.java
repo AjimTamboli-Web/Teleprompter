@@ -28,7 +28,7 @@ public class ParcelResponse {
 	private LocalDateTime createdAt;
 	private LocalDateTime updatedAt;
 	
-	private Long sourceCityId;
-	private Long destinationCityId;
+	private CitySummaryResponse sourceCity;
+	private CitySummaryResponse destinationCity;
 	
 }
