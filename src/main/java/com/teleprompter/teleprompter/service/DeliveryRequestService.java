@@ -23,10 +23,13 @@ import com.teleprompter.teleprompter.repository.DeliveryRequestRepository;
 import com.teleprompter.teleprompter.repository.JourneyRepository;
 import com.teleprompter.teleprompter.repository.ParcelRepository;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Service
+@Slf4j
 public class DeliveryRequestService {
 
-	private static final Logger log = LoggerFactory.getLogger(DeliveryRequestService.class);
+//	private static final Logger log = LoggerFactory.getLogger(DeliveryRequestService.class);
 	
 	private final DeliveryRequestRepository deliveryRequestRepo;
 	private final ParcelRepository parcelRepo;
@@ -82,7 +85,7 @@ public class DeliveryRequestService {
 		
 		// Rule 7: Duplicate pre-check
 		if(deliveryRequestRepo.existsByParcelIdAndJourneyId(request.getParcelId(), request.getJourneyId())) {
-			throw new DuplicateResourceException("Delivery","parcelId & journeyId", request.getParcelId() + " " + request.getJourneyId());
+			throw new DuplicateResourceException("Delivery","parcelId & journeyId", request.getParcelId() + ":" + request.getJourneyId());
 		}
 		
 		// Mapping fields and copying addresses (since they are @NotBlank in DTO)
