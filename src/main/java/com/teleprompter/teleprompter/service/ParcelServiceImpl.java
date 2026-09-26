@@ -120,7 +120,7 @@ public class ParcelServiceImpl{
 		Page<Parcel> parcelPage = parcelRepo.findAll(pageable);
 		
 		// 2. Transformation: Safe transformation preserving all pagination metadata
-        // We use method reference 'parcelMapper::toResponse' for clean functional style
+        // We use method reference 'parcelMapr::toResponse' for clean functional style
 	    return 	parcelPage.map(parcelMap::toResponse);
 		
 	}
