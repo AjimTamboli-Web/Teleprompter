@@ -46,7 +46,7 @@ public class ParcelController {
 	     ParcelResponse responseBody =	parcelService.createParcel(request);
 		
 	     URI location = ServletUriComponentsBuilder.fromCurrentRequest()
-	    		 .path("{id}")
+	    		 .path("/{id}")
 	    		 .buildAndExpand(responseBody.getId())
 	    		 .toUri();
 	     
