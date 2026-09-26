@@ -14,6 +14,7 @@ import com.teleprompter.teleprompter.dtos.DeliveryRequestResponse;
 import com.teleprompter.teleprompter.entity.DeliveryRequest;
 import com.teleprompter.teleprompter.entity.Journey;
 import com.teleprompter.teleprompter.entity.Parcel;
+import com.teleprompter.teleprompter.enums.DeliveryRequestStatus;
 import com.teleprompter.teleprompter.enums.JourneyStatus;
 import com.teleprompter.teleprompter.enums.ParcelStatus;
 import com.teleprompter.teleprompter.exception.BusinessRuleViolationException;
@@ -84,8 +85,8 @@ public class DeliveryRequestService {
 		}
 		
 		// Rule 7: Duplicate pre-check
-		if(deliveryRequestRepo.existsByParcelIdAndJourneyId(request.getParcelId(), request.getJourneyId())) {
-			throw new DuplicateResourceException("Delivery","parcelId & journeyId", request.getParcelId() + ":" + request.getJourneyId());
+		if(deliveryRequestRepo.existsByParcelIdAndJourneyId(parcel.getId(), journey.getId())) {
+			throw new DuplicateResourceException("Delivery","parcelId & journeyId", parcel.getId() + ":" + journey.getId());
 		}
 		
 		// Mapping fields and copying addresses (since they are @NotBlank in DTO)
@@ -95,6 +96,9 @@ public class DeliveryRequestService {
 		deliveryRequest.setJourney(journey);
 		deliveryRequest.setPickupAddress(request.getPickupAddress());
 		deliveryRequest.setDropAddress(request.getDropAddress());
+		
+//		Setting status explicitly for clear lifecycle visibility
+		deliveryRequest.setStatus(DeliveryRequestStatus.PENDING);
 		
 		DeliveryRequest savedRequest = deliveryRequestRepo.save(deliveryRequest);
 		
