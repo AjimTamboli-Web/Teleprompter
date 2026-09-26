@@ -22,6 +22,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
+import jakarta.persistence.Version;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -32,6 +33,11 @@ import lombok.Setter;
 		"journey_id" }), indexes = @Index(name = "idx_delivery_request_journey", columnList = "journey_id"))
 public class DeliveryRequest {
 
+	@Version
+	@Column(nullable = false)
+	@ColumnDefault("0")
+	private Long version;
+	
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "delivery_seq")
 	@SequenceGenerator(name = "delivery_seq", sequenceName = "delivery_sequence", allocationSize = 50)

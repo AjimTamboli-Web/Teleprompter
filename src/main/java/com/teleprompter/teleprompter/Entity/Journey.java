@@ -20,6 +20,7 @@ import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -37,6 +38,11 @@ public class Journey {
 //	transport_mode VARCHAR(20), status VARCHAR(20) DEFAULT 'PUBLISHED' 
 //	(PUBLISHED/IN_PROGRESS/COMPLETED/CANCELLED)
 
+	@Version
+	@Column(nullable = false)
+	@ColumnDefault("0")
+	private Long version;
+	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;

@@ -21,12 +21,19 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Version;
 import lombok.Getter;
 import lombok.Setter;
 
 @Entity @Getter @Setter
 public class Parcel {
 
+	@Version
+	@Column(nullable = false)
+	@ColumnDefault("0")
+	private Long version;
+	
+	
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "parcel_seq")
 	@SequenceGenerator(name = "parcel_seq",sequenceName = "parcel_sequence",allocationSize = 50)
