@@ -1,5 +1,7 @@
 package com.teleprompter.teleprompter.controller;
 
+import java.net.URI;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.teleprompter.teleprompter.dtos.CreateParcelRequest;
 import com.teleprompter.teleprompter.dtos.ParcelResponse;
@@ -42,7 +45,12 @@ public class ParcelController {
 		
 	     ParcelResponse responseBody =	parcelService.createParcel(request);
 		
-	     return ResponseEntity.status(HttpStatus.CREATED).body(responseBody); 
+	     URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+	    		 .path("{id}")
+	    		 .buildAndExpand(responseBody.getId())
+	    		 .toUri();
+	     
+	     return ResponseEntity.created(location).body(responseBody); 
 	}
 	
 	@GetMapping("/{id}")
