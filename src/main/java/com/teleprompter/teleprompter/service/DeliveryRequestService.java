@@ -100,7 +100,7 @@ public class DeliveryRequestService {
 //		Setting status explicitly for clear lifecycle visibility
 		deliveryRequest.setStatus(DeliveryRequestStatus.PENDING);
 		
-		DeliveryRequest savedRequest = deliveryRequestRepo.save(deliveryRequest);
+		DeliveryRequest savedRequest = deliveryRequestRepo.saveAndFlush(deliveryRequest);
 		
 		// Added a log line at INFO level, with the request id only.
 		log.info("Delivery request created with id: {}", savedRequest.getId());
