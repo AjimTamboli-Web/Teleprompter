@@ -78,7 +78,7 @@ public class ParcelServiceImpl{
 	      parcel.setDestinationCity(destinationCity);
 	      
 	      // 4. Persistence: Write the managed entity to PostgreSQL
-	      Parcel savedParcel = parcelRepo.save(parcel);
+	      Parcel savedParcel = parcelRepo.saveAndFlush(parcel);
 	     
 	      // 5. Outbound Transformation: Return shaped data to the controller boundary
 	      return parcelMap.toResponse(savedParcel);
