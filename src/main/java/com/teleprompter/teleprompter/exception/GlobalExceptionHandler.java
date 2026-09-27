@@ -7,6 +7,7 @@ import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -107,7 +108,8 @@ public class GlobalExceptionHandler {
 
 	/**
 	 * [Handler 2 - NEW]: Handles validated controller method parameters
-	 * ( @Min, @Max). Extracts multi-field errors dynamically and maps to a uniform structure.
+	 * ( @Min, @Max). Extracts multi-field errors dynamically and maps to a uniform
+	 * structure.
 	 */
 	@ExceptionHandler(HandlerMethodValidationException.class)
 	public ResponseEntity<ValidationErrorResponse> handleHandlerMethodValidation(HandlerMethodValidationException ex,
@@ -139,6 +141,15 @@ public class GlobalExceptionHandler {
 				request.getRequestURI());
 
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+	}
+
+//	If someone else already changed the row, the version no longer matches, zero rows are updated, and Hibernate throws an exception
+	@ExceptionHandler(ObjectOptimisticLockingFailureException.class)
+	public ResponseEntity<ErrorResponse> handleOptimisticLockingFailure(ObjectOptimisticLockingFailureException ex,
+			HttpServletRequest request) {
+		String safeMessage = "The resource was changed by another request. Please reload and try again.";
+
+		return buildErrorResponse(HttpStatus.CONFLICT, safeMessage, request);
 	}
 
 }
