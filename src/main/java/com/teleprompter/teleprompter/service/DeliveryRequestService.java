@@ -3,8 +3,6 @@ package com.teleprompter.teleprompter.service;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -116,5 +114,48 @@ public class DeliveryRequestService {
 		
 		return deliveryMapper.toResponse(request);
 	}
+	
+	@Transactional
+	public DeliveryRequestResponse acceptRequest(Long id) {
+		
+		DeliveryRequest request = deliveryRequestRepo.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException("Delivery request","id",id));
+		
+		if(!request.getStatus().transitionTo(DeliveryRequestStatus.ACCEPTED)) {
+			throw new BusinessRuleViolationException("Cannot accept a request that is not PENDING.");
+		}
+		
+//		TODO : until JWT 
+		Journey traveler = request.getJourney();
+		Parcel parcel = request.getParcel();
+		
+		// 422 Business	Re-checks
+		if(traveler.getStatus() != JourneyStatus.PUBLISHED) {
+			throw new BusinessRuleViolationException("Traveler is no longer actively published.");
+		}
+		
+		if(parcel.getStatus() != ParcelStatus.AWAITING_MATCH) {
+			throw new BusinessRuleViolationException("Parcel has already been matched with another traveler.");
+		}
+		
+		if(traveler.getAvailableWeightCapacity().compareTo(parcel.getWeight()) < 0) {
+			throw new BusinessRuleViolationException("The parcel weight exceeds the remaining capacity of the journey.");
+		}
+		
+		
+		// Effects
+		request.setStatus(DeliveryRequestStatus.ACCEPTED);
+		request.setAcceptedAt(LocalDateTime.now());
+		
+		parcel.setStatus(ParcelStatus.MATCHED);
+		traveler.setAvailableWeightCapacity(traveler.getAvailableWeightCapacity().subtract(parcel.getWeight()));
+		
+		
+//		Our choice: Auto-cancel the remaining PENDING requests
+//		(You can run custom queries or loops in the repository; here, we are keeping the database clean.)
+		return deliveryMapper.toResponse(request);
+
+	}
+	
 	
 }
