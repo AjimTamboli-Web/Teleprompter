@@ -50,5 +50,12 @@ public class DeliveryRequestController {
 		return ResponseEntity.ok(response);
 	}
 	
+	@PostMapping("/{id}/accept")
+	public ResponseEntity<DeliveryRequestResponse> acceptRequest(@PathVariable Long id){
+		DeliveryRequestResponse response = requestService.acceptRequest(id);
+		return ResponseEntity.ok(response);
+	}
+	
+	
 	
 }
