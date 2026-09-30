@@ -175,5 +175,37 @@ public class DeliveryRequestService {
 		return deliveryMapper.toResponse(request);
 	
 	}
+	
+	public DeliveryRequestResponse cancelRequest(Long id) {
+		
+		DeliveryRequest request = deliveryRequestRepo.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException("DeliveryRequest","id",id));
+		
+//		State Machine Check: Is it possible to change the current status to CANCELLED?
+		DeliveryRequestStatus oldStatus = request.getStatus();
+		if(!oldStatus.transitionTo(DeliveryRequestStatus.CANCELLED)) {
+			throw new BusinessRuleViolationException("Cannot cancel a request that is already closed.");
+		}
+		
+//		State Transition   (Effects)
+		request.setStatus(DeliveryRequestStatus.CANCELLED);
+		request.setClosedAt(LocalDateTime.now());
+		
+//		Special Business Rule: If the request was already accepted, restore the held capacity.
+		if(oldStatus == DeliveryRequestStatus.ACCEPTED) {
+			Journey journey = request.getJourney();
+			Parcel parcel = request.getParcel();
+			
+//			1. Add the weight back into the traveler's capacity.
+			journey.setAvailableWeightCapacity(journey.getAvailableWeightCapacity().add(parcel.getWeight()));
+			
+//			2. Put the parcel back on the market so that someone else can match it.
+			parcel.setStatus(ParcelStatus.AWAITING_MATCH);
+		
+		}
+		
+		return deliveryMapper.toResponse(request);
+		
+	}
 }
 
