@@ -157,5 +157,23 @@ public class DeliveryRequestService {
 
 	}
 	
+	@Transactional
+	public DeliveryRequestResponse rejectRequest(Long id) {
+		DeliveryRequest request = deliveryRequestRepo.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException("DeliveryRequest","id",id));
+		
+//		State Machine check: Is it possible to move from PENDING to REJECTED?
+		if(!request.getStatus().transitionTo(DeliveryRequestStatus.REJECTED)) {
+			throw new BusinessRuleViolationException("Can only reject a request that is currently PENDING.");
+		}
+		
+		// State Transition
+		request.setStatus(DeliveryRequestStatus.REJECTED);
+		request.setClosedAt(LocalDateTime.now());
+		
+		// Dirty checking automatically fires the UPDATE query at the end of transaction
+		return deliveryMapper.toResponse(request);
 	
+	}
 }
+
