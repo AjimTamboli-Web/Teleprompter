@@ -2,7 +2,6 @@ package com.teleprompter.teleprompter.controller;
 
 import java.net.URI;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -56,6 +55,11 @@ public class DeliveryRequestController {
 		return ResponseEntity.ok(response);
 	}
 	
+	@PostMapping("/{id}/reject")
+	public ResponseEntity<DeliveryRequestResponse> rejectRequest(@PathVariable Long id){
+		DeliveryRequestResponse response = requestService.rejectRequest(id);
+		return ResponseEntity.ok(response);
+	}
 	
 	
 }
