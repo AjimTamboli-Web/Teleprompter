@@ -61,5 +61,10 @@ public class DeliveryRequestController {
 		return ResponseEntity.ok(response);
 	}
 	
+	@PostMapping("/{id}/cancel")
+	public ResponseEntity<DeliveryRequestResponse> cancelRequest(@PathVariable Long id){
+		DeliveryRequestResponse response = requestService.cancelRequest(id);
+		return ResponseEntity.ok(response);
+	}
 	
 }
