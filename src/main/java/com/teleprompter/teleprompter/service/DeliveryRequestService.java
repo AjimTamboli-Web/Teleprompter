@@ -106,7 +106,7 @@ public class DeliveryRequestService {
 		return deliveryMapper.toResponse(savedRequest);
 	}
 
-	@Transactional(readOnly = true) // skip dirty checking 
+	@Transactional(readOnly = true) 
 	public DeliveryRequestResponse getDeliveryRequestById(Long id) {   // we can use as a Location header at endpoint
 		
 		DeliveryRequest request = deliveryRequestRepo.findById(id)
@@ -121,11 +121,12 @@ public class DeliveryRequestService {
 		DeliveryRequest request = deliveryRequestRepo.findById(id)
 				.orElseThrow(() -> new ResourceNotFoundException("Delivery request","id",id));
 		
+		// TODO: Validate that 'user' is the owner (traveler) of the journey
 		if(!request.getStatus().transitionTo(DeliveryRequestStatus.ACCEPTED)) {
 			throw new BusinessRuleViolationException("Cannot accept a request that is not PENDING.");
 		}
 		
-//		TODO : until JWT 
+
 		Journey traveler = request.getJourney();
 		Parcel parcel = request.getParcel();
 		
@@ -150,9 +151,11 @@ public class DeliveryRequestService {
 		parcel.setStatus(ParcelStatus.MATCHED);
 		traveler.setAvailableWeightCapacity(traveler.getAvailableWeightCapacity().subtract(parcel.getWeight()));
 		
+		 // Flush before mapping to trigger version checks early		
+		deliveryRequestRepo.flush();
 		
-//		Our choice: Auto-cancel the remaining PENDING requests
-//		(You can run custom queries or loops in the repository; here, we are keeping the database clean.)
+		
+		
 		return deliveryMapper.toResponse(request);
 
 	}
@@ -162,7 +165,7 @@ public class DeliveryRequestService {
 		DeliveryRequest request = deliveryRequestRepo.findById(id)
 				.orElseThrow(() -> new ResourceNotFoundException("DeliveryRequest","id",id));
 		
-//		State Machine check: Is it possible to move from PENDING to REJECTED?
+		// TODO: Validate that 'user' is the owner (traveler) of the journey
 		if(!request.getStatus().transitionTo(DeliveryRequestStatus.REJECTED)) {
 			throw new BusinessRuleViolationException("Can only reject a request that is currently PENDING.");
 		}
@@ -171,7 +174,9 @@ public class DeliveryRequestService {
 		request.setStatus(DeliveryRequestStatus.REJECTED);
 		request.setClosedAt(LocalDateTime.now());
 		
-		// Dirty checking automatically fires the UPDATE query at the end of transaction
+		deliveryRequestRepo.flush();   // Flush before mapping to trigger version checks early	
+		
+		
 		return deliveryMapper.toResponse(request);
 	
 	}
@@ -181,7 +186,7 @@ public class DeliveryRequestService {
 		DeliveryRequest request = deliveryRequestRepo.findById(id)
 				.orElseThrow(() -> new ResourceNotFoundException("DeliveryRequest","id",id));
 		
-//		State Machine Check: Is it possible to change the current status to CANCELLED?
+		// TODO: Validate that 'user' is the owner (sender) of the parcel
 		DeliveryRequestStatus oldStatus = request.getStatus();
 		if(!oldStatus.transitionTo(DeliveryRequestStatus.CANCELLED)) {
 			throw new BusinessRuleViolationException("Cannot cancel a request that is already closed.");
@@ -196,13 +201,15 @@ public class DeliveryRequestService {
 			Journey journey = request.getJourney();
 			Parcel parcel = request.getParcel();
 			
-//			1. Add the weight back into the traveler's capacity.
+
 			journey.setAvailableWeightCapacity(journey.getAvailableWeightCapacity().add(parcel.getWeight()));
 			
-//			2. Put the parcel back on the market so that someone else can match it.
+
 			parcel.setStatus(ParcelStatus.AWAITING_MATCH);
 		
 		}
+		
+		deliveryRequestRepo.flush();    // Flush before mapping to trigger version checks early	
 		
 		return deliveryMapper.toResponse(request);
 		
