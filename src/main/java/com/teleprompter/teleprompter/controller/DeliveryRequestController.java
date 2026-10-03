@@ -22,49 +22,47 @@ import jakarta.validation.Valid;
 public class DeliveryRequestController {
 
 	private final DeliveryRequestService requestService;
-	
+
 	public DeliveryRequestController(DeliveryRequestService service) {
 		this.requestService = service;
 	}
-	
+
 	@PostMapping
-	public ResponseEntity<DeliveryRequestResponse> createRequest(@Valid @RequestBody CreateDeliveryRequest request){
-		
+	public ResponseEntity<DeliveryRequestResponse> createRequest(@Valid @RequestBody CreateDeliveryRequest request) {
+
 		DeliveryRequestResponse responseBody = requestService.createDeliveryRequest(request);
-		
-		URI location = ServletUriComponentsBuilder.fromCurrentRequest()
-				   .path("/{id}")
-				   .buildAndExpand(responseBody.getId())
-				   .toUri();
-		
+
+		URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
+				.buildAndExpand(responseBody.getId()).toUri();
+
 		return ResponseEntity.created(location).body(responseBody);
-		
+
 	}
-	
+
 	@GetMapping("/{id}")
-	public ResponseEntity<DeliveryRequestResponse> getRequestById(@PathVariable Long id){
-		
+	public ResponseEntity<DeliveryRequestResponse> getRequestById(@PathVariable Long id) {
+
 		DeliveryRequestResponse response = requestService.getDeliveryRequestById(id);
-		
+
 		return ResponseEntity.ok(response);
 	}
-	
+
 	@PostMapping("/{id}/accept")
-	public ResponseEntity<DeliveryRequestResponse> acceptRequest(@PathVariable Long id){
+	public ResponseEntity<DeliveryRequestResponse> acceptRequest(@PathVariable Long id) {
 		DeliveryRequestResponse response = requestService.acceptRequest(id);
 		return ResponseEntity.ok(response);
 	}
-	
+
 	@PostMapping("/{id}/reject")
-	public ResponseEntity<DeliveryRequestResponse> rejectRequest(@PathVariable Long id){
+	public ResponseEntity<DeliveryRequestResponse> rejectRequest(@PathVariable Long id) {
 		DeliveryRequestResponse response = requestService.rejectRequest(id);
 		return ResponseEntity.ok(response);
 	}
-	
+
 	@PostMapping("/{id}/cancel")
-	public ResponseEntity<DeliveryRequestResponse> cancelRequest(@PathVariable Long id){
+	public ResponseEntity<DeliveryRequestResponse> cancelRequest(@PathVariable Long id) {
 		DeliveryRequestResponse response = requestService.cancelRequest(id);
 		return ResponseEntity.ok(response);
 	}
-	
+
 }
