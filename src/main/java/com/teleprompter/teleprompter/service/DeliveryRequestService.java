@@ -181,6 +181,7 @@ public class DeliveryRequestService {
 	
 	}
 	
+	@Transactional
 	public DeliveryRequestResponse cancelRequest(Long id) {
 		
 		DeliveryRequest request = deliveryRequestRepo.findById(id)
@@ -214,5 +215,8 @@ public class DeliveryRequestService {
 		return deliveryMapper.toResponse(request);
 		
 	}
+	
+	
+	
 }
 
