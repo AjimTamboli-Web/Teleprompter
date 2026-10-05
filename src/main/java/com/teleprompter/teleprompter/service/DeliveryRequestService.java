@@ -3,6 +3,8 @@ package com.teleprompter.teleprompter.service;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -216,7 +218,21 @@ public class DeliveryRequestService {
 		
 	}
 	
+	@Transactional(readOnly = true)
+	public Page<DeliveryRequestResponse> getListByJourney(Long journeyId,Pageable pageable){
+		
+		// 1. First, check whether the journey actually exists; if not, return a 404.
+		if(!journeyRepo.existsById(journeyId)) {
+			throw new ResourceNotFoundException("journey","id",journeyId);
+		}
+		
+		// 2. Load the page using a single query from the database (without N+1)
+		Page<DeliveryRequest> requestPage = deliveryRequestRepo.findByJourneyId(journeyId, pageable);
+		
+		// 3. Map while maintaining a stable page shape
+		return requestPage.map(deliveryMapper::toResponse);
 	
+	}
 	
 }
 
