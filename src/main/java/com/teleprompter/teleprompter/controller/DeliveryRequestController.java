@@ -28,6 +28,9 @@ import jakarta.validation.constraints.Min;
 @RequestMapping("/api/delivery-requests")
 public class DeliveryRequestController {
 
+	// A constant cap has been set to protect the server from heavy load
+		private static final int MAX_PAGE_SIZE = 50;
+	
 	private final DeliveryRequestService requestService;
 
 	public DeliveryRequestController(DeliveryRequestService service) {
@@ -75,7 +78,7 @@ public class DeliveryRequestController {
 	@GetMapping
 	public ResponseEntity<Page<DeliveryRequestResponse>> getListByJourney(@RequestParam Long journeyId,
 			@RequestParam(defaultValue = "0") @Min(0) int page,
-			@RequestParam(defaultValue = "0") @Min(1) @Max(50) int size) {
+			@RequestParam(defaultValue = "10") @Min(1) @Max(MAX_PAGE_SIZE) int size) {
 
 //		 Stable Ordering Pattern: Sort by ID (or creation date) first, and then use an ID as a tie-breaker.
 //		This ensures that the paging result remains completely stable and consistent (deterministic) every time.
