@@ -25,5 +25,6 @@ public interface DeliveryRequestRepository extends JpaRepository<DeliveryRequest
 //	Derived Query using 'In' keyword to check active requests before journey completion.
 	boolean existsByJourneyIdAndStatusIn(Long journeyId, List<DeliveryRequestStatus> statuses);
 
+	List<DeliveryRequest> findByJourneyId(Long id);
 
 }

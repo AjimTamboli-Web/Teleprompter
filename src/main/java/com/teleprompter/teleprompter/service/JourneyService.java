@@ -14,10 +14,12 @@ import com.teleprompter.teleprompter.dtos.CreateJourneyRequest;
 import com.teleprompter.teleprompter.dtos.JourneyMapper;
 import com.teleprompter.teleprompter.dtos.JourneyResponse;
 import com.teleprompter.teleprompter.entity.City;
+import com.teleprompter.teleprompter.entity.DeliveryRequest;
 import com.teleprompter.teleprompter.entity.Journey;
 import com.teleprompter.teleprompter.entity.User;
 import com.teleprompter.teleprompter.enums.DeliveryRequestStatus;
 import com.teleprompter.teleprompter.enums.JourneyStatus;
+import com.teleprompter.teleprompter.enums.ParcelStatus;
 import com.teleprompter.teleprompter.enums.UserStatus;
 import com.teleprompter.teleprompter.exception.BusinessRuleViolationException;
 import com.teleprompter.teleprompter.exception.ResourceNotFoundException;
@@ -36,14 +38,15 @@ public class JourneyService {
 	private final UserRepository userRepository;
 	private final CityRepository cityRepository;
 	private final JourneyMapper journeyMapper;
-	DeliveryRequestRepository deliveryRequestRepository;
+	private final DeliveryRequestRepository deliveryRequestRepository;
 
 	public JourneyService(JourneyRepository journeyRepo, UserRepository userRepo, CityRepository cityRepo,
-			JourneyMapper journeyMapper) {
+			JourneyMapper journeyMapper, DeliveryRequestRepository deliveryRequestRepository) {
 		this.journeyRepository = journeyRepo;
 		this.userRepository = userRepo;
 		this.cityRepository = cityRepo;
 		this.journeyMapper = journeyMapper;
+		this.deliveryRequestRepository = deliveryRequestRepository;
 	}
 
 	@Transactional
@@ -131,26 +134,35 @@ public class JourneyService {
 	}
 
 	@Transactional
-	public JourneyResponse cancelJourney(Long id) {
+	public void cancelJourney(Long id) {
 
 		Journey journey = journeyRepository.findById(id)
 				.orElseThrow(() -> new ResourceNotFoundException("Journey", "id", id));
 
 		/*
 		 * TODO : Owner check (only the journey's traveler may cancel) comes with JWT
-		 * TODO : Pending delivery requests must also be cancelled once DeliveryRequest
-		 * exists
 		 */
 
 //		ENUM state machine called
 		if (!journey.getStatus().canTransitionTo(JourneyStatus.CANCELLED)) {
-			throw new BusinessRuleViolationException("journey must be in valid state.");
+			throw new BusinessRuleViolationException("journey cannot be cancelled.");
 		}
 
 //		Only setter called, No repository.save() needed
 		journey.setStatus(JourneyStatus.CANCELLED);
 
-		return journeyMapper.toResponse(journey);
+// 		🚀 Bulk Cascade Update using Memory Loops (Preserves Dirty Checking & @Version)
+		List<DeliveryRequest> requests = deliveryRequestRepository.findByJourneyId(id);
+		for(DeliveryRequest req : requests) {
+			if(req.getStatus() == DeliveryRequestStatus.PENDING) {
+				req.setStatus(DeliveryRequestStatus.CANCELLED);
+				req.setClosedAt(LocalDateTime.now());
+			} else if(req.getStatus() == DeliveryRequestStatus.ACCEPTED) {
+				req.setStatus(DeliveryRequestStatus.CANCELLED);
+				req.setClosedAt(LocalDateTime.now());
+				req.getParcel().setStatus(ParcelStatus.AWAITING_MATCH); // Parcel back to market
+			}
+		}
 	}
 
 	@Transactional
