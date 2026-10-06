@@ -18,7 +18,7 @@ public enum DeliveryRequestStatus {
 		};
 	}
 	
-	public boolean transitionTo(DeliveryRequestStatus target) {
+	public boolean canTransitionTo(DeliveryRequestStatus target) {
 		return allowedNext().contains(target);
 	}
 	
