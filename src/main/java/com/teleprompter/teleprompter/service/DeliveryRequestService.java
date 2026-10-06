@@ -121,19 +121,23 @@ public class DeliveryRequestService {
 	public DeliveryRequestResponse acceptRequest(Long id) {
 		
 		DeliveryRequest request = deliveryRequestRepo.findById(id)
-				.orElseThrow(() -> new ResourceNotFoundException("Delivery request","id",id));
+				.orElseThrow(() -> new ResourceNotFoundException("DeliveryRequest","id",id));
 		
 		// TODO: Validate that 'user' is the owner (traveler) of the journey
-		if(!request.getStatus().transitionTo(DeliveryRequestStatus.ACCEPTED)) {
+		if(!request.getStatus().canTransitionTo(DeliveryRequestStatus.ACCEPTED)) {
 			throw new BusinessRuleViolationException("Cannot accept a request that is not PENDING.");
 		}
 		
 
-		Journey traveler = request.getJourney();
+		Journey journey = request.getJourney();
 		Parcel parcel = request.getParcel();
 		
 		// 422 Business	Re-checks
-		if(traveler.getStatus() != JourneyStatus.PUBLISHED) {
+		if(journey.getDepartureTime().isBefore(LocalDateTime.now())) {
+			throw new BusinessRuleViolationException("Cannot accept a request for a journey that has already departed.");
+		}
+		
+		if(journey.getStatus() != JourneyStatus.PUBLISHED) {
 			throw new BusinessRuleViolationException("Traveler is no longer actively published.");
 		}
 		
@@ -141,7 +145,7 @@ public class DeliveryRequestService {
 			throw new BusinessRuleViolationException("Parcel has already been matched with another traveler.");
 		}
 		
-		if(traveler.getAvailableWeightCapacity().compareTo(parcel.getWeight()) < 0) {
+		if(journey.getAvailableWeightCapacity().compareTo(parcel.getWeight()) < 0) {
 			throw new BusinessRuleViolationException("The parcel weight exceeds the remaining capacity of the journey.");
 		}
 		
@@ -151,12 +155,12 @@ public class DeliveryRequestService {
 		request.setAcceptedAt(LocalDateTime.now());
 		
 		parcel.setStatus(ParcelStatus.MATCHED);
-		traveler.setAvailableWeightCapacity(traveler.getAvailableWeightCapacity().subtract(parcel.getWeight()));
+		journey.setAvailableWeightCapacity(journey.getAvailableWeightCapacity().subtract(parcel.getWeight()));
 		
 		 // Flush before mapping to trigger version checks early		
 		deliveryRequestRepo.flush();
 		
-		
+		log.info("Delivery request accepted with id: {}", request.getId());
 		
 		return deliveryMapper.toResponse(request);
 
@@ -168,7 +172,7 @@ public class DeliveryRequestService {
 				.orElseThrow(() -> new ResourceNotFoundException("DeliveryRequest","id",id));
 		
 		// TODO: Validate that 'user' is the owner (traveler) of the journey
-		if(!request.getStatus().transitionTo(DeliveryRequestStatus.REJECTED)) {
+		if(!request.getStatus().canTransitionTo(DeliveryRequestStatus.REJECTED)) {
 			throw new BusinessRuleViolationException("Can only reject a request that is currently PENDING.");
 		}
 		
@@ -178,6 +182,7 @@ public class DeliveryRequestService {
 		
 		deliveryRequestRepo.flush();   // Flush before mapping to trigger version checks early	
 		
+		log.info("Delivery request rejected with id: {}", request.getId());
 		
 		return deliveryMapper.toResponse(request);
 	
@@ -191,7 +196,7 @@ public class DeliveryRequestService {
 		
 		// TODO: Validate that 'user' is the owner (sender) of the parcel
 		DeliveryRequestStatus oldStatus = request.getStatus();
-		if(!oldStatus.transitionTo(DeliveryRequestStatus.CANCELLED)) {
+		if(!oldStatus.canTransitionTo(DeliveryRequestStatus.CANCELLED)) {
 			throw new BusinessRuleViolationException("Cannot cancel a request that is already closed.");
 		}
 		
@@ -214,6 +219,8 @@ public class DeliveryRequestService {
 		
 		deliveryRequestRepo.flush();    // Flush before mapping to trigger version checks early	
 		
+		log.info("Delivery request canceled with id: {}", request.getId());
+		
 		return deliveryMapper.toResponse(request);
 		
 	}
@@ -223,7 +230,7 @@ public class DeliveryRequestService {
 		
 		// 1. First, check whether the journey actually exists; if not, return a 404.
 		if(!journeyRepo.existsById(journeyId)) {
-			throw new ResourceNotFoundException("journey","id",journeyId);
+			throw new ResourceNotFoundException("Journey","id",journeyId);
 		}
 		
 		// 2. Load the page using a single query from the database (without N+1)
