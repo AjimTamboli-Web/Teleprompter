@@ -1,18 +1,19 @@
 package com.teleprompter.teleprompter.enums;
 
-import com.teleprompter.teleprompter.exception.BusinessRuleViolationException;
+import java.util.Set;
+
 
 public enum JourneyStatus {
 	
 			PUBLISHED,  IN_PROGRESS, COMPLETED, CANCELLED;
 		
-	// allowed transition logic
-			public JourneyStatus transitionTo(JourneyStatus nextStatus) {
-				if(this == PUBLISHED && nextStatus == CANCELLED) {
-					return CANCELLED;
-				}
-				
-				throw new BusinessRuleViolationException("Cannot transition journey from " + this + " to " + nextStatus);
-			}
+//	Complete life-cycle
+	public boolean canTransitionTo(JourneyStatus target) {
+		return switch (target) {
+		case PUBLISHED -> Set.of(IN_PROGRESS, CANCELLED).contains(target);
+		case IN_PROGRESS -> Set.of(COMPLETED).contains(target);
+		case COMPLETED, CANCELLED -> false;
+		};
+	}
 			
 }
