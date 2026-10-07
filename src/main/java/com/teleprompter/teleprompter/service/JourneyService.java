@@ -138,12 +138,29 @@ public class JourneyService {
 		 */
 		
 //		ENUM state machine called
-		JourneyStatus targetStatus = journey.getStatus().transitionTo(JourneyStatus.CANCELLED);
+		if(!journey.getStatus().canTransitionTo(JourneyStatus.CANCELLED)) {
+			throw new BusinessRuleViolationException("journey must be in valid state.");
+		}
 
 //		Only setter called, No repository.save() needed
-		journey.setStatus(targetStatus);
+		journey.setStatus(JourneyStatus.CANCELLED);
 
 		return journeyMapper.toResponse(journey);
 	}
 
+	@Transactional
+	public JourneyResponse startJourney(Long id) {
+		Journey journey = journeyRepository.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException("Journey","id",id));
+		
+		 // TODO: Owner Check
+		if(!journey.getStatus().canTransitionTo(JourneyStatus.IN_PROGRESS)) {
+			throw new BusinessRuleViolationException("Invalid status transition.");
+		}
+		
+		journey.setStatus(JourneyStatus.IN_PROGRESS);
+		
+		return journeyMapper.toResponse(journey);
+	}
+	
 }
