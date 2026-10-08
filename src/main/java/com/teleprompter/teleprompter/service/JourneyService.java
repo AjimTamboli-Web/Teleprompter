@@ -2,6 +2,7 @@ package com.teleprompter.teleprompter.service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
 
 import org.springframework.data.domain.Page;
@@ -15,11 +16,13 @@ import com.teleprompter.teleprompter.dtos.JourneyResponse;
 import com.teleprompter.teleprompter.entity.City;
 import com.teleprompter.teleprompter.entity.Journey;
 import com.teleprompter.teleprompter.entity.User;
+import com.teleprompter.teleprompter.enums.DeliveryRequestStatus;
 import com.teleprompter.teleprompter.enums.JourneyStatus;
 import com.teleprompter.teleprompter.enums.UserStatus;
 import com.teleprompter.teleprompter.exception.BusinessRuleViolationException;
 import com.teleprompter.teleprompter.exception.ResourceNotFoundException;
 import com.teleprompter.teleprompter.repository.CityRepository;
+import com.teleprompter.teleprompter.repository.DeliveryRequestRepository;
 import com.teleprompter.teleprompter.repository.JourneyRepository;
 import com.teleprompter.teleprompter.repository.UserRepository;
 
@@ -33,6 +36,7 @@ public class JourneyService {
 	private final UserRepository userRepository;
 	private final CityRepository cityRepository;
 	private final JourneyMapper journeyMapper;
+	DeliveryRequestRepository deliveryRequestRepository;
 
 	public JourneyService(JourneyRepository journeyRepo, UserRepository userRepo, CityRepository cityRepo,
 			JourneyMapper journeyMapper) {
@@ -134,11 +138,12 @@ public class JourneyService {
 
 		/*
 		 * TODO : Owner check (only the journey's traveler may cancel) comes with JWT
-		 * TODO : Pending delivery requests must also be cancelled once DeliveryRequest exists
+		 * TODO : Pending delivery requests must also be cancelled once DeliveryRequest
+		 * exists
 		 */
-		
+
 //		ENUM state machine called
-		if(!journey.getStatus().canTransitionTo(JourneyStatus.CANCELLED)) {
+		if (!journey.getStatus().canTransitionTo(JourneyStatus.CANCELLED)) {
 			throw new BusinessRuleViolationException("journey must be in valid state.");
 		}
 
@@ -151,16 +156,39 @@ public class JourneyService {
 	@Transactional
 	public JourneyResponse startJourney(Long id) {
 		Journey journey = journeyRepository.findById(id)
-				.orElseThrow(() -> new ResourceNotFoundException("Journey","id",id));
-		
-		 // TODO: Owner Check
-		if(!journey.getStatus().canTransitionTo(JourneyStatus.IN_PROGRESS)) {
+				.orElseThrow(() -> new ResourceNotFoundException("Journey", "id", id));
+
+		// TODO: Owner Check
+		if (!journey.getStatus().canTransitionTo(JourneyStatus.IN_PROGRESS)) {
 			throw new BusinessRuleViolationException("Invalid status transition.");
 		}
-		
+
 		journey.setStatus(JourneyStatus.IN_PROGRESS);
+
+		return journeyMapper.toResponse(journey);
+	}
+
+	@Transactional
+	public JourneyResponse completeJourney(Long id) {
+		Journey journey = journeyRepository.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException("Journey", "id", id));
+
+		// TODO: Owner Check
+
+		// Check if any request is still ACCEPTED, PICKED_UP or IN_TRANSIT using our 'In' query.
+		boolean hasActiveRequest = deliveryRequestRepository.existsByJourneyIdAndStatusIn(id,
+				List.of(DeliveryRequestStatus.ACCEPTED,DeliveryRequestStatus.PICKED_UP,DeliveryRequestStatus.IN_TRANSIT));
+
+		if(hasActiveRequest) {
+			throw new BusinessRuleViolationException("Cannot complete journey while delivery requests are still active.");
+		}
+		
+		if(!journey.getStatus().canTransitionTo(JourneyStatus.COMPLETED)) {
+			throw new BusinessRuleViolationException("Invalid Status Transition.");
+		}
+		
+		journey.setStatus(JourneyStatus.COMPLETED);
 		
 		return journeyMapper.toResponse(journey);
 	}
-	
 }
