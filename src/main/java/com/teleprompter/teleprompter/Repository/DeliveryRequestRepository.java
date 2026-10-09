@@ -27,4 +27,5 @@ public interface DeliveryRequestRepository extends JpaRepository<DeliveryRequest
 
 	List<DeliveryRequest> findByJourneyId(Long id);
 
+	List<DeliveryRequest> findByParcelId(Long id);
 }
