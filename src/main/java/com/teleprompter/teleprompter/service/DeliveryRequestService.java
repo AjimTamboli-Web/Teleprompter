@@ -272,5 +272,27 @@ public class DeliveryRequestService {
 		return deliveryMapper.toResponse(request);
 	}
 	
+	@Transactional
+	public DeliveryRequestResponse transitRequest(Long id) {
+		
+		DeliveryRequest request = deliveryRequestRepo.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException("DeliveryRequest","id",id));
+		
+		// TODO: Owner's check (Journey's traveler)
+		
+		// State Machine Transition Check (PICKED_UP -> IN_TRANSIT)
+		if(!request.getStatus().canTransitionTo(DeliveryRequestStatus.IN_TRANSIT)) {
+			throw new BusinessRuleViolationException("Invalid status transition for in-transit");
+		}
+		
+		
+		request.setStatus(DeliveryRequestStatus.IN_TRANSIT);
+		
+		deliveryRequestRepo.flush();   // Enforce optimistic lock checking before mapping
+		
+		return deliveryMapper.toResponse(request);
+	}
+	
+	
 }
 
