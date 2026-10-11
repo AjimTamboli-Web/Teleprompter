@@ -241,5 +241,36 @@ public class DeliveryRequestService {
 	
 	}
 	
+	@Transactional
+	public DeliveryRequestResponse pickupRequest(Long id) {
+		DeliveryRequest request = deliveryRequestRepo.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException("DeliveryRequest","id",id));
+		
+		 // TODO: Owner check (Journey's traveler)
+		
+//		Rule: Journey must be IN_PROGRESS to pick up
+		if(request.getJourney().getStatus() != JourneyStatus.IN_PROGRESS) {
+			throw new BusinessRuleViolationException("Cannot pick up a parcel unless the journey is IN_PROGRESS.");
+		}
+		
+//		State Machine Transition Check(Accepted -> Pick up)
+		if(!request.getStatus().canTransitionTo(DeliveryRequestStatus.PICKED_UP)) {
+			throw new BusinessRuleViolationException("Invalid status transition for pickup.");
+		}
+		
+		// Effects
+		request.setStatus(DeliveryRequestStatus.PICKED_UP);
+		request.setPickedUpAt(LocalDateTime.now());
+		
+		
+		// Parcel State Change
+		request.getParcel().setStatus(ParcelStatus.IN_TRANSIT);
+		
+		// Enforce optimistic lock checking before mapping
+		deliveryRequestRepo.flush();  
+		
+		return deliveryMapper.toResponse(request);
+	}
+	
 }
 
