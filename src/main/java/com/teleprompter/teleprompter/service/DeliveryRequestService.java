@@ -294,5 +294,32 @@ public class DeliveryRequestService {
 	}
 	
 	
+	@Transactional
+	public DeliveryRequestResponse deliverRequest(Long id) {
+		
+		DeliveryRequest request = deliveryRequestRepo.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException("DeliveryRequest","id",id));
+		
+		// TODO: Owner's check (Journey's traveler)
+		
+		// State Machine Transition Check(IN_TRANSIT -> DELIVERED)
+		if(!request.getStatus().canTransitionTo(DeliveryRequestStatus.DELIVERED)) {
+			throw new BusinessRuleViolationException("Invalid status Transition for DELIVERED");
+		}
+		
+		// Effects
+		request.setStatus(DeliveryRequestStatus.DELIVERED);
+		request.setDeliveredAt(LocalDateTime.now());
+		request.setClosedAt(LocalDateTime.now());
+		
+		// Parcel marks as DELIVERED
+		request.getParcel().setStatus(ParcelStatus.DELIVERED);
+		
+		deliveryRequestRepo.flush();       // Enforce optimistic lock checking before mapping
+		
+		return deliveryMapper.toResponse(request);
+	}
+	
+	
 }
 
