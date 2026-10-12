@@ -96,5 +96,11 @@ public class DeliveryRequestController {
 		return ResponseEntity.ok(response);
 	}
 	
+	@PostMapping("/{id}/in-transit")
+	public ResponseEntity<DeliveryRequestResponse> transitRequest(@PathVariable Long id){
+		DeliveryRequestResponse response = requestService.transitRequest(id);
+		return ResponseEntity.ok(response);
+	}
+	
 	
 }
