@@ -89,4 +89,12 @@ public class DeliveryRequestController {
 		return ResponseEntity.ok(responsePage);
 	}
 
+	@PostMapping("/{id}/pickup")
+	public ResponseEntity<DeliveryRequestResponse> pickupRequest(@PathVariable Long id){
+		 // Current user parameter will be wired properly post-JWT task
+		DeliveryRequestResponse response = requestService.pickupRequest(id);
+		return ResponseEntity.ok(response);
+	}
+	
+	
 }
