@@ -102,5 +102,9 @@ public class DeliveryRequestController {
 		return ResponseEntity.ok(response);
 	}
 	
-	
+	@PostMapping("/{id}/deliver")
+	public ResponseEntity<DeliveryRequestResponse> deliverRequest(@PathVariable Long id){
+		DeliveryRequestResponse response = requestService.deliverRequest(id);
+		return ResponseEntity.ok(response);
+	}
 }
