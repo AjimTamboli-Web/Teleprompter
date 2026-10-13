@@ -84,4 +84,10 @@ public class ParcelController {
 		
 	}
 	
+	@PostMapping("/{id}/cancel")
+	public ResponseEntity<ParcelResponse> cancelParcel(@PathVariable Long id){
+		 // Decision applied: POST used for cancellation transition instead of misleading DELETE
+		ParcelResponse response = parcelService.deleteParcel(id);
+		return ResponseEntity.ok(response);
+	}
 }
