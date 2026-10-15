@@ -83,7 +83,7 @@ public class JourneyController {
 	public ResponseEntity<JourneyResponse> cancelJourney(@PathVariable Long id){
 		
 		JourneyResponse updatedJourney = journeyService.cancelJourney(id);
-		
+		     
 		return ResponseEntity.ok(updatedJourney);
 	}
 }

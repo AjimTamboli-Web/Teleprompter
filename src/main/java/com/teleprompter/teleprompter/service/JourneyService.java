@@ -134,7 +134,7 @@ public class JourneyService {
 	}
 
 	@Transactional
-	public void cancelJourney(Long id) {
+	public JourneyResponse cancelJourney(Long id) {
 
 		Journey journey = journeyRepository.findById(id)
 				.orElseThrow(() -> new ResourceNotFoundException("Journey", "id", id));
@@ -163,6 +163,8 @@ public class JourneyService {
 				req.getParcel().setStatus(ParcelStatus.AWAITING_MATCH); // Parcel back to market
 			}
 		}
+		
+		return journeyMapper.toResponse(journey);
 	}
 
 	@Transactional
