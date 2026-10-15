@@ -86,4 +86,12 @@ public class JourneyController {
 		     
 		return ResponseEntity.ok(updatedJourney);
 	}
+	
+	
+	@PostMapping("/{id}/start")
+	public ResponseEntity<JourneyResponse> startJourney(@PathVariable Long id){
+		JourneyResponse response = journeyService.startJourney(id);
+		return ResponseEntity.ok(response);
+	}
+	
 }
