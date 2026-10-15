@@ -94,4 +94,11 @@ public class JourneyController {
 		return ResponseEntity.ok(response);
 	}
 	
+	
+	@PostMapping("/{id}/complete")
+	public ResponseEntity<JourneyResponse> competeJourney(@PathVariable Long id){
+		JourneyResponse  response = journeyService.completeJourney(id);
+		return ResponseEntity.ok(response);
+	}
+	
 }
