@@ -164,6 +164,8 @@ public class JourneyService {
 			}
 		}
 		
+		journeyRepository.flush();   // Forces optimistic lock evaluation before transaction ends
+		
 		return journeyMapper.toResponse(journey);
 	}
 
