@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import com.teleprompter.teleprompter.enums.ParcelCategory;
+import com.teleprompter.teleprompter.enums.ParcelStatus;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -30,5 +31,7 @@ public class ParcelResponse {
 	
 	private CitySummaryResponse sourceCity;
 	private CitySummaryResponse destinationCity;
+	
+	private ParcelStatus status;    // Added status field for transparent lifecycle visibility
 	
 }

@@ -183,6 +183,8 @@ public class ParcelServiceImpl {
 			}
 		}
 
+		parcelRepo.flush(); // fix: Explicit flush BEFORE mapping ensures updatedAt is current.
+		
 		return parcelMap.toResponse(parcel);
 	}
 

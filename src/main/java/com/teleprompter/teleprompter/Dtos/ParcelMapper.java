@@ -39,6 +39,8 @@ public class ParcelMapper {
 //		Mapping nested relationship using private helper
 		response.setSender(mapToSenderSummary(parcel.getSender()));
 
+		response.setStatus(parcel.getStatus());
+		
 		return response;
 	}
 
