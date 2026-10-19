@@ -8,7 +8,7 @@ public enum DeliveryRequestStatus {
 	DELIVERED, CANCELLED;
 	
 	
-	Set<DeliveryRequestStatus> allowedNext(){     // java 17 switch that returns the allowed set works well. 
+	Set<DeliveryRequestStatus> allowedNext(){ 
 		return switch(this) {
 		case PENDING -> Set.of(ACCEPTED, REJECTED, CANCELLED);
 		case ACCEPTED -> Set.of(PICKED_UP, CANCELLED);

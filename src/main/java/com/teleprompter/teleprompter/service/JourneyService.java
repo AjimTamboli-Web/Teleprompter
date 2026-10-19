@@ -145,13 +145,13 @@ public class JourneyService {
 
 //		ENUM state machine called
 		if (!journey.getStatus().canTransitionTo(JourneyStatus.CANCELLED)) {
-			throw new BusinessRuleViolationException("journey cannot be cancelled.");
+			throw new BusinessRuleViolationException("Journey cannot be cancelled.");
 		}
 
 //		Only setter called, No repository.save() needed
 		journey.setStatus(JourneyStatus.CANCELLED);
 
-// 		🚀 Bulk Cascade Update using Memory Loops (Preserves Dirty Checking & @Version)
+// 		Sequential entity loop updates to preserve dirty checking and @Version updates
 		List<DeliveryRequest> requests = deliveryRequestRepository.findByJourneyId(id);
 		for(DeliveryRequest req : requests) {
 			if(req.getStatus() == DeliveryRequestStatus.PENDING) {

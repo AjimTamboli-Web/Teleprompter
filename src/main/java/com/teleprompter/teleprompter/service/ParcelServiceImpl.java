@@ -49,13 +49,12 @@ public class ParcelServiceImpl {
 		this.deliveryRequestRepository = deliveryRequestRepository;
 	}
 
-	@Transactional // Ensures the entire creation process runs inside a database transaction
-					// boundary
+	@Transactional // Ensures the entire creation process runs inside a database transaction boundary
 	public ParcelResponse createParcel(CreateParcelRequest request) {
 
 //		Same city check (Fail Fast)
 		if (Objects.equals(request.getSourceCityId(), request.getDestinationCityId())) {
-			throw new BusinessRuleViolationException("Source and destination cities must be different.");
+			throw new BusinessRuleViolationException("Source and Destination cities must be different.");
 		}
 
 		// 1. Database Verification: Core business check before logic execution
