@@ -162,7 +162,7 @@ public class ParcelServiceImpl {
 	}
 
 	@Transactional
-	public ParcelResponse deleteParcel(Long id) { // (Replacing Hard Delete with POST Cancel)
+	public ParcelResponse cancelParcel(Long id) { // (Replacing Hard Delete with POST Cancel)
 
 		Parcel parcel = parcelRepo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Parcel", "id", id));
 
