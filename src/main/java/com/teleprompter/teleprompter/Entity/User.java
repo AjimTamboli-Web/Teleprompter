@@ -4,6 +4,7 @@ import java.util.UUID;
 
 import org.hibernate.annotations.ColumnDefault;
 
+import com.teleprompter.teleprompter.enums.UserRole;
 import com.teleprompter.teleprompter.enums.UserStatus;
 
 import jakarta.persistence.Column;
@@ -48,5 +49,8 @@ public class User {
 	@ColumnDefault("'ACTIVE'")
 	private UserStatus status = UserStatus.ACTIVE;
 	
-	
+	@Column(length = 6, nullable = false)
+	@Enumerated(EnumType.STRING)
+	@ColumnDefault("'USER'")
+	private UserRole role = UserRole.USER;
 }
