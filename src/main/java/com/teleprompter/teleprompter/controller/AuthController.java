@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.teleprompter.teleprompter.dtos.LoginRequest;
-import com.teleprompter.teleprompter.dtos.UserResponse;
+import com.teleprompter.teleprompter.dtos.LoginResponse;
 import com.teleprompter.teleprompter.service.UserService;
 
 import jakarta.validation.Valid;
@@ -23,9 +23,9 @@ public class AuthController {
 	}
 	
 	@PostMapping("/login")
-	public ResponseEntity<UserResponse> login(@Valid @RequestBody LoginRequest request){
+	public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request){
 		
-		UserResponse response = userService.login(request);
+		LoginResponse response = userService.login(request);
 		
 		return ResponseEntity.ok(response);
 		
