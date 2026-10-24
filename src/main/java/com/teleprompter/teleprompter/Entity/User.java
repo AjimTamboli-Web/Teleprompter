@@ -49,7 +49,7 @@ public class User {
 	@ColumnDefault("'ACTIVE'")
 	private UserStatus status = UserStatus.ACTIVE;
 	
-	@Column(length = 6, nullable = false)
+	@Column(length = 20, nullable = false)
 	@Enumerated(EnumType.STRING)
 	@ColumnDefault("'USER'")
 	private UserRole role = UserRole.USER;
